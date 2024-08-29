@@ -7,6 +7,7 @@ import { Message } from './Message';
 import { Overlay } from './ui/Overlay';
 import { Progress } from './ui/Progress';
 import { emit, Messages } from './events';
+import { GetProp } from '/server/interface';
 import { applyUpdate, setHash } from './hot';
 
 export interface Options {

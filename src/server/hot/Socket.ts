@@ -132,34 +132,34 @@ export class Socket {
       }
     }
 
-    if (options.progress) {
-      let value = 0;
+    // if (options.progress) {
+    //   let value = 0;
 
-      // @ts-expect-error
-      const progress = new rspack.ProgressPlugin((percentage, status, message) => {
-        const nextValue = Math.floor(percentage * 100);
+    //   // @ts-expect-error
+    //   const progress = new rspack.ProgressPlugin((percentage, status, message) => {
+    //     const nextValue = Math.floor(percentage * 100);
 
-        if (nextValue > value || nextValue === 0) {
-          value = nextValue;
+    //     if (nextValue > value || nextValue === 0) {
+    //       value = nextValue;
 
-          switch (value) {
-            case 0:
-              status = 'start';
-              message = 'end idle';
-              break;
-            case 100:
-              status = 'finish';
-              message = 'begin idle';
-              break;
-          }
+    //       switch (value) {
+    //         case 0:
+    //           status = 'start';
+    //           message = 'end idle';
+    //           break;
+    //         case 100:
+    //           status = 'finish';
+    //           message = 'begin idle';
+    //           break;
+    //       }
 
-          this.broadcast(this.clients(), 'progress', { status, message, value });
-        }
-      });
+    //       this.broadcast(this.clients(), 'progress', { status, message, value });
+    //     }
+    //   });
 
-      // @ts-expect-error
-      progress.apply(compiler);
-    }
+    //   // @ts-expect-error
+    //   progress.apply(compiler);
+    // }
   }
 
   clients(): Set<WebSocket> {

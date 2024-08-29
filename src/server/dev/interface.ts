@@ -5,7 +5,7 @@
 import rspack from '@rspack/core';
 import { FileSystem } from './utils/fs';
 import { Options as ServiceOptions, Service } from './Service';
-import { ICompiler, ILogger, IStats, IStatsOptions, IWatching } from '/server/interface';
+import { ICompiler, ILogger, IStats, IStatsOptions, IWatching, Optional } from '/server/interface';
 
 export interface Callback {
   (stats: IStats): void;

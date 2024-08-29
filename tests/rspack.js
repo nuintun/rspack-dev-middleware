@@ -45,10 +45,8 @@ const compiler = rspack({
     path: path.resolve('wwwroot/public'),
     assetModuleFilename: `[path][name][ext]`
   },
-  devtool: 'eval-cheap-module-source-map',
-  resolve: {
-    fallback: { url: false },
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  experiments: {
+    css: true
   },
   watchOptions: {
     aggregateTimeout: 256
@@ -61,16 +59,10 @@ const compiler = rspack({
     runtimeModules: false,
     dependentModules: false
   },
-  plugins: [
-    new rspack.HtmlRspackPlugin(html),
-    new rspack.CssExtractRspackPlugin({
-      ignoreOrder: true,
-      filename: 'css/[name].css',
-      chunkFilename: 'css/[name].css'
-    })
-  ],
-  experiments: {
-    css: true
+  devtool: 'eval-cheap-module-source-map',
+  resolve: {
+    fallback: { url: false },
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   module: {
     parser: {
@@ -114,7 +106,8 @@ const compiler = rspack({
         exclude: /[\\/]node_modules[\\/]/
       }
     ]
-  }
+  },
+  plugins: [new rspack.HtmlRspackPlugin(html)]
 });
 
 const port = 8000;

@@ -3,7 +3,6 @@
  */
 
 /// <reference types="react" />
-/// <reference types="../global.d.ts" />
 /// <reference types="@rspack/core/module" />
 
 declare module '*.module.css' {
@@ -11,25 +10,25 @@ declare module '*.module.css' {
     readonly [name: string]: string;
   };
 
-  export default content;
+  export = content;
 }
 
 declare module '*.css' {
   const content: string;
 
-  export default content;
+  export = content;
 }
 
 declare module '*.svg' {
   const content: string;
 
-  export default content;
+  export = content;
 }
 
 declare module '*.mp4' {
   const content: string;
 
-  export default content;
+  export = content;
 }
 
 declare module 'rspack-dev-middleware/client' {

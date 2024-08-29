@@ -4,6 +4,7 @@
 
 import rspack from '@rspack/core';
 import { ReadStream, Stats } from 'fs';
+import { GetProp } from '/server/interface';
 
 type PathLike = string | Buffer | URL;
 
