@@ -98,7 +98,6 @@ const compiler = rspack({
         test: /\.css$/i,
         type: 'css/auto',
         exclude: /[\\/]node_modules[\\/]/
-        // loader: rspack.CssExtractRspackPlugin.loader
       },
       {
         test: /\.(svg|mp4)$/i,
