@@ -107,7 +107,7 @@ const compiler = rspack({
       }
     ]
   },
-  plugins: [new rspack.HtmlRspackPlugin(html)]
+  plugins: [new rspack.HtmlRspackPlugin(html), new rspack.ProgressPlugin()]
 });
 
 const port = 8000;
