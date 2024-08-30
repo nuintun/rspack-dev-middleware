@@ -106,7 +106,13 @@ const compiler = rspack({
       }
     ]
   },
-  plugins: [new rspack.HtmlRspackPlugin(html), new rspack.ProgressPlugin()]
+  plugins: [
+    new rspack.ProgressPlugin({
+      prefix: '[Rspack]',
+      progressChars: '█▒'
+    }),
+    new rspack.HtmlRspackPlugin(html)
+  ]
 });
 
 const port = 8000;
