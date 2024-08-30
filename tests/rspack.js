@@ -13,16 +13,6 @@ import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');
 
-const html = {
-  minify: false,
-  title: 'React',
-  filename: entryHTML,
-  templateParameters: { lang: 'en' },
-  template: path.resolve('index.ejs'),
-  favicon: path.resolve('src/images/favicon.ico'),
-  meta: { 'theme-color': '#4285f4', viewport: 'width=device-width,initial-scale=1.0' }
-};
-
 function createMemfs() {
   const volume = new memfs.Volume();
   const fs = memfs.createFsFromVolume(volume);
@@ -33,6 +23,16 @@ function createMemfs() {
 function httpError(error) {
   return /^(EOF|EPIPE|ECANCELED|ECONNRESET|ECONNABORTED)$/i.test(error.code);
 }
+
+const html = {
+  minify: true,
+  title: 'React',
+  filename: entryHTML,
+  templateParameters: { lang: 'en' },
+  template: path.resolve('index.ejs'),
+  favicon: path.resolve('src/images/favicon.ico'),
+  meta: { 'theme-color': '#4285f4', viewport: 'width=device-width,initial-scale=1.0' }
+};
 
 const compiler = rspack({
   name: 'react',
