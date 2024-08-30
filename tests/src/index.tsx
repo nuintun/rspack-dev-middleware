@@ -7,12 +7,8 @@ const root = createRoot(app);
 root.render(<App />);
 
 if (import.meta.webpackHot) {
-  import.meta.webpackHot.accept('./App.tsx', () => {
-    root.render(<App />);
-  });
-
   import(
-    // webpackMode: 'eager'
+    /* webpackMode: "eager" */
     'rspack-dev-middleware/client'
   ).then(({ on }) => {
     on('ok', ({ timestamp }) => {

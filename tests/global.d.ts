@@ -32,5 +32,7 @@ declare module '*.mp4' {
 }
 
 declare module 'rspack-dev-middleware/client' {
-  export = import('../types/client/index');
+  const { on, off } = await import('../types/client');
+
+  export { on, off };
 }

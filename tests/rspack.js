@@ -9,6 +9,7 @@ import memfs from 'memfs';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
 import dev from 'rspack-dev-middleware';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');
 
@@ -85,6 +86,7 @@ const compiler = rspack({
             },
             transform: {
               react: {
+                refresh: true,
                 runtime: 'automatic'
               }
             }
@@ -107,6 +109,7 @@ const compiler = rspack({
     ]
   },
   plugins: [
+    new ReactRefreshPlugin(),
     new rspack.ProgressPlugin({
       prefix: '[Rspack]',
       progressChars: '█▒'
