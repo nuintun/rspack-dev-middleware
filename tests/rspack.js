@@ -47,7 +47,8 @@ const compiler = rspack({
     assetModuleFilename: `[path][name][ext]`
   },
   experiments: {
-    css: true
+    css: true,
+    lazyCompilation: true
   },
   watchOptions: {
     aggregateTimeout: 256
