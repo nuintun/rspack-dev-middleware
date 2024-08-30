@@ -8,6 +8,7 @@ import treeShake from './plugins/tree-shake.js';
 import webpackHot from './plugins/webpack-hot.js';
 import { createRequire, isBuiltin } from 'module';
 import typescript from '@rollup/plugin-typescript';
+import url from '@rollup/plugin-url';
 
 const pkg = createRequire(import.meta.url)('../package.json');
 
@@ -100,7 +101,7 @@ export default function rollup(esnext) {
         entryFileNames: `[name].${esnext ? 'js' : 'cjs'}`,
         chunkFileNames: `[name].${esnext ? 'js' : 'cjs'}`
       },
-      plugins: [webpackHot(esnext), typescript(), treeShake()],
+      plugins: [url({ limit: Infinity }), webpackHot(esnext), typescript(), treeShake()],
       onwarn(error, warn) {
         if (error.code !== 'CIRCULAR_DEPENDENCY') {
           warn(error);
