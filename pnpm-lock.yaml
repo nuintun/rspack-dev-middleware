@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@nuintun/ansi':
-        specifier: ^0.0.6
-        version: 0.0.6
+        specifier: ^0.0.8
+        version: 0.0.8
       '@types/koa':
         specifier: ^2.15.0
         version: 2.15.0
@@ -163,8 +163,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@nuintun/ansi@0.0.6':
-    resolution: {integrity: sha512-/HlWVnFwoHW2NQz1MNA6rJ/kWNHX+FLPDWnFXppmFreSfJR8pyRqNJWsH64aSEOINEvLbfPB7U7wRVsW1gKuqw==}
+  '@nuintun/ansi@0.0.8':
+    resolution: {integrity: sha512-q1GanxEtdczE5mBMixGT78/TKJJAgcfAhm2FShyyXcKoiE3gcru/Odnf1m9sUKsbcn2M0MHLAPkwspErhIKL1A==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1117,7 +1117,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@nuintun/ansi@0.0.6':
+  '@nuintun/ansi@0.0.8':
     dependencies:
       tslib: 2.7.0
 
