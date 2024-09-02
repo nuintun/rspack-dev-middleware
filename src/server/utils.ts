@@ -34,5 +34,5 @@ export function getCompilers(compiler: ICompiler): rspack.Compiler[] {
 }
 
 export function isMultiCompiler(compiler: ICompiler): compiler is rspack.MultiCompiler {
-  return compiler instanceof rspack.MultiCompiler;
+  return 'compilers' in compiler;
 }

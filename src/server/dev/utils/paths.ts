@@ -25,7 +25,7 @@ function normalize(path: string): string {
 }
 
 function getStats(stats: IStats): rspack.Stats[] {
-  if (stats instanceof rspack.MultiStats) {
+  if ('stats' in stats) {
     return stats.stats;
   }
 
