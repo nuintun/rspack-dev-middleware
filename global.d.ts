@@ -12,4 +12,6 @@ declare module '*.svg' {
 
 declare const __HOT_CLIENT__: string;
 
+declare const __PLUGIN_NAME__: string;
+
 declare type HotUpdateStatus = `${Rspack.HotUpdateStatus}`;

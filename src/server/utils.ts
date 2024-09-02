@@ -7,7 +7,7 @@ import { ICompiler } from './interface';
 
 const { toString } = Object.prototype;
 
-export const PLUGIN_NAME = 'rspack-dev-middleware';
+export const PLUGIN_NAME = __PLUGIN_NAME__;
 
 export function isObject(value: unknown): value is object {
   return toString.call(value) === '[object Object]';
