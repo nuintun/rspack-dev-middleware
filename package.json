@@ -89,7 +89,7 @@
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-typescript": "^11.1.6",
     "@rollup/plugin-url": "^8.0.2",
-    "@rspack/core": "^1.0.0",
+    "@rspack/core": "^1.0.1",
     "@rspack/plugin-react-refresh": "^1.0.0",
     "@types/destroy": "^1.0.3",
     "@types/etag": "^1.8.3",
