@@ -6,7 +6,7 @@
 import rspack from '@rspack/core';
 import { ansiToHTML, appendHTML, getRootElement, injectCSS } from './utils';
 
-const OVERLAY = 'wds-overlay';
+const OVERLAY = 'rdm-overlay';
 
 const CSS = `
 .${OVERLAY} {

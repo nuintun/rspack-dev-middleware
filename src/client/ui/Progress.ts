@@ -7,7 +7,7 @@
 import logo from './images/rspack-logo.svg';
 import { appendHTML, getRootElement, injectCSS } from './utils';
 
-const PROGRESS = 'wds-progress';
+const PROGRESS = 'rdm-progress';
 const PERIMETER = 2 * Math.PI * 44;
 
 const CSS = `
