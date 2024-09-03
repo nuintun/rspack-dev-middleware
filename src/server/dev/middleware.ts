@@ -45,7 +45,7 @@ function getFileServices(context: Context, stats: IStats): FileService[] {
   return services;
 }
 
-function getFileServicesAsync(context: Context): Promise<FileService[]> {
+function getFileServicesAsync(context: Context, path: string): Promise<FileService[]> {
   return new Promise(resolve => {
     const { stats } = context;
 
@@ -53,6 +53,9 @@ function getFileServicesAsync(context: Context): Promise<FileService[]> {
     if (stats) {
       resolve(getFileServices(context, stats));
     } else {
+      // Log waiting info.
+      context.logger.info(`wait until bundle finished: ${path}`);
+
       // Otherwise, wait until bundle finished.
       ready(context, stats => {
         resolve(getFileServices(context, stats));
@@ -74,7 +77,7 @@ export function middleware(context: Context): Middleware {
     // Only support GET and HEAD (405).
     if (ctx.method === 'GET' || ctx.method === 'HEAD') {
       // Get the file services.
-      const services = await getFileServicesAsync(context);
+      const services = await getFileServicesAsync(context, path);
 
       // Try to respond.
       for (const [publicPath, service] of services) {
