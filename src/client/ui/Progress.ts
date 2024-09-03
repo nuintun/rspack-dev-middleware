@@ -32,7 +32,7 @@ const CSS = `
   transform: scale(1) translateZ(0);
 }
 .${PROGRESS}-track {
-  stroke: #badfac;
+  stroke: #eded91;
   stroke-width: 8;
   stroke-linecap: round;
   fill: rgba(0, 0, 0, 0);
@@ -45,7 +45,7 @@ const CSS = `
 
 const HTML = `
 <svg class="${PROGRESS}" x="0" y="0" viewBox="0 0 96 96">
-  <circle fill="#282d35" cx="50%" cy="50%" r="44" />
+  <circle fill="#23272f" cx="50%" cy="50%" r="44" />
   <circle class="${PROGRESS}-track" cx="50%" cy="50%" r="44" />
   <image href="${logo}" x="16" y="22.053" width="64" height="49.894"/>
 </svg>
