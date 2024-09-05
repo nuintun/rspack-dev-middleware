@@ -30,7 +30,7 @@ const html = {
   filename: entryHTML,
   templateParameters: { lang: 'en' },
   template: path.resolve('index.ejs'),
-  favicon: path.resolve('src/images/favicon.ico'),
+  favicon: path.resolve('src/images/favicon.png'),
   meta: { 'theme-color': '#4285f4', viewport: 'width=device-width,initial-scale=1.0' }
 };
 
