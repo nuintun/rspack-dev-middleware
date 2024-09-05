@@ -26,7 +26,7 @@ function httpError(error) {
 
 const html = {
   minify: true,
-  title: 'React',
+  title: 'Rspack',
   filename: entryHTML,
   templateParameters: { lang: 'en' },
   template: path.resolve('index.ejs'),
