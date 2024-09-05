@@ -108,8 +108,8 @@ const compiler = rspack({
         exclude: /[\\/]node_modules[\\/]/
       },
       {
-        test: /\.(svg|mp4)$/i,
         type: 'asset/resource',
+        test: /\.(svg|png|mp4)$/i,
         exclude: /[\\/]node_modules[\\/]/
       }
     ]
