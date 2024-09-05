@@ -6,8 +6,8 @@
 import Koa from 'koa';
 import path from 'path';
 import memfs from 'memfs';
+import rspack from '@rspack/core';
 import compress from 'koa-compress';
-import { rspack } from '@rspack/core';
 import dev from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
