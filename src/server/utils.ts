@@ -3,7 +3,7 @@
  */
 
 import rspack from '@rspack/core';
-import { ICompiler } from './interface';
+import { UnionCompiler } from './interface';
 
 const { toString } = Object.prototype;
 
@@ -25,7 +25,7 @@ export function isFunction(value: unknown): value is Function {
   return typeof value === 'function';
 }
 
-export function getCompilers(compiler: ICompiler): rspack.Compiler[] {
+export function getCompilers(compiler: UnionCompiler): rspack.Compiler[] {
   if (isMultiCompiler(compiler)) {
     return compiler.compilers;
   }
@@ -33,6 +33,6 @@ export function getCompilers(compiler: ICompiler): rspack.Compiler[] {
   return [compiler];
 }
 
-export function isMultiCompiler(compiler: ICompiler): compiler is rspack.MultiCompiler {
+export function isMultiCompiler(compiler: UnionCompiler): compiler is rspack.MultiCompiler {
   return 'compilers' in compiler;
 }

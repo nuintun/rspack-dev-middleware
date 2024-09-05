@@ -5,7 +5,7 @@
 import { URL } from 'url';
 import { unixify } from './path';
 import rspack from '@rspack/core';
-import { IStats } from '/server/interface';
+import { UnionStats } from '/server/interface';
 
 type PathsItem = [
   // Output path.
@@ -24,7 +24,7 @@ function normalize(path: string): string {
   return `/${path}`;
 }
 
-function getStats(stats: IStats): rspack.Stats[] {
+function getStats(stats: UnionStats): rspack.Stats[] {
   if ('stats' in stats) {
     return stats.stats;
   }
@@ -60,7 +60,7 @@ function getOutputPath(compilation: rspack.Compilation): string {
   return compilation.getPath(path ?? '');
 }
 
-export function getPaths(stats: IStats): PathsItem[] {
+export function getPaths(stats: UnionStats): PathsItem[] {
   const paths: PathsItem[] = [];
   const childStats = getStats(stats);
 

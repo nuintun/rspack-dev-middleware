@@ -5,10 +5,10 @@
 import rspack from '@rspack/core';
 import { FileSystem } from './utils/fs';
 import { Options as ServiceOptions, Service } from './Service';
-import { ICompiler, ILogger, IStats, IStatsOptions, IWatching, Optional } from '/server/interface';
+import { Logger, Optional, StatsOptions, UnionCompiler, UnionStats, UnionWatching } from '/server/interface';
 
 export interface Callback {
-  (stats: IStats): void;
+  (stats: UnionStats): void;
 }
 
 export interface ErrorCallback {
@@ -16,8 +16,8 @@ export interface ErrorCallback {
 }
 
 export interface Expose {
+  readonly logger: Logger;
   readonly state: boolean;
-  readonly logger: ILogger;
   readonly ready: (callback: Callback) => void;
   readonly close: (callback: ErrorCallback) => void;
   readonly invalidate: (callback: ErrorCallback) => void;
@@ -27,20 +27,20 @@ export type FileService = [publicPath: string, service: Service];
 
 export interface Options extends Omit<ServiceOptions, 'fs'> {
   fs?: FileSystem;
-  stats?: IStatsOptions;
+  stats?: StatsOptions;
   writeToDisk?: boolean | ((targetPath: string) => boolean);
-  onCompilationDone?: (stats: IStats, statsOptions: Readonly<rspack.StatsOptions>) => void;
+  onCompilationDone?: (stats: UnionStats, statsOptions: Readonly<rspack.StatsOptions>) => void;
 }
 
 export interface Context {
   fs: FileSystem;
-  logger: ILogger;
+  logger: Logger;
   options: Options;
-  compiler: ICompiler;
-  watching: IWatching;
-  stats: IStats | null;
   callbacks: Callback[];
+  compiler: UnionCompiler;
+  watching: UnionWatching;
   services?: FileService[];
+  stats: UnionStats | null;
 }
 
 export type InitialContext = Optional<Context, 'fs' | 'watching'>;

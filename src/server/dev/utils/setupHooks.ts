@@ -5,10 +5,10 @@
 import rspack from '@rspack/core';
 import supportsColor from 'supports-color';
 import { InitialContext } from '/server/dev/interface';
-import { IStats, IStatsOptions } from '/server/interface';
+import { StatsOptions, UnionStats } from '/server/interface';
 import { isBoolean, isMultiCompiler, isString, PLUGIN_NAME } from '/server/utils';
 
-function normalizeStatsOptions(statsOptions?: IStatsOptions): rspack.StatsOptions {
+function normalizeStatsOptions(statsOptions?: StatsOptions): rspack.StatsOptions {
   if (statsOptions == null) {
     return { preset: 'normal' };
   } else if (isString(statsOptions)) {
@@ -68,7 +68,7 @@ export function setupHooks(context: InitialContext): void {
   };
 
   const {
-    onCompilationDone = (stats: IStats, statsOptions: rspack.StatsOptions) => {
+    onCompilationDone = (stats: UnionStats, statsOptions: rspack.StatsOptions) => {
       const printedStats = stats.toString(statsOptions);
 
       // Avoid extra empty line when `stats: 'none'`.
@@ -78,7 +78,7 @@ export function setupHooks(context: InitialContext): void {
     }
   } = context.options;
 
-  const done = (stats: IStats): void => {
+  const done = (stats: UnionStats): void => {
     // We are now on valid state
     context.stats = stats;
 
