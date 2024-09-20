@@ -96,7 +96,7 @@
     "@types/koa-compose": "^3.2.8",
     "@types/node": "^22.5.5",
     "@types/range-parser": "^1.2.7",
-    "@types/react": "^18.3.7",
+    "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "koa": "^2.15.3",
     "koa-compress": "^5.1.1",
