@@ -85,7 +85,9 @@ export class Progress {
   }
 
   hide(): void {
-    if (!this.hidden) {
+    if (this.hidden) {
+      this.update(0);
+    } else {
       this.hidden = true;
 
       this.timer = self.setTimeout(() => {

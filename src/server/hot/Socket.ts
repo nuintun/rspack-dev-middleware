@@ -25,11 +25,14 @@ function entrypoint(): string {
 const client = resolve(entrypoint(), __HOT_CLIENT__);
 
 export class Socket {
+  // Readonly props.
   private readonly logger: Logger;
   private readonly compiler: UnionCompiler;
   private readonly server: WebSocketServer;
   private readonly options: Required<Options>;
 
+  // Mutable props.
+  private percentage: number = -1;
   private stats: rspack.StatsCompilation | null = null;
 
   constructor(compiler: UnionCompiler, options?: Options) {
@@ -94,6 +97,8 @@ export class Socket {
     hooks.invalid.tap(PLUGIN_NAME, (path, timestamp) => {
       // Set stats to null.
       this.stats = null;
+      // Reset percentage.
+      this.percentage = -1;
 
       // Broadcast invalid.
       this.broadcast(this.clients(), 'invalid', { path, timestamp });
@@ -133,11 +138,9 @@ export class Socket {
     }
 
     if (options.progress) {
-      let latestPercentage = -1;
-
       const progress = new rspack.ProgressPlugin((percentage, status, ...messages) => {
-        if (percentage !== latestPercentage) {
-          latestPercentage = percentage;
+        if (percentage > this.percentage) {
+          this.percentage = percentage;
 
           this.broadcast(this.clients(), 'progress', { status, messages, percentage });
         }
