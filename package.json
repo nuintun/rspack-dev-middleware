@@ -86,7 +86,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-typescript": "^12.1.0",
     "@rollup/plugin-url": "^8.0.2",
     "@rspack/core": "^1.0.5",
@@ -94,7 +94,7 @@
     "@types/destroy": "^1.0.3",
     "@types/etag": "^1.8.3",
     "@types/koa-compose": "^3.2.8",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.6.1",
     "@types/range-parser": "^1.2.7",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
