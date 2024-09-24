@@ -132,34 +132,20 @@ export class Socket {
       }
     }
 
-    // if (options.progress) {
-    //   let value = 0;
+    if (options.progress) {
+      let latestPercentage = -1;
 
-    //   // @ts-expect-error
-    //   const progress = new rspack.ProgressPlugin((percentage, status, message) => {
-    //     const nextValue = Math.floor(percentage * 100);
+      const progress = new rspack.ProgressPlugin((percentage, status, ...messages) => {
+        if (percentage !== latestPercentage) {
+          latestPercentage = percentage;
 
-    //     if (nextValue > value || nextValue === 0) {
-    //       value = nextValue;
+          this.broadcast(this.clients(), 'progress', { status, messages, percentage });
+        }
+      });
 
-    //       switch (value) {
-    //         case 0:
-    //           status = 'start';
-    //           message = 'end idle';
-    //           break;
-    //         case 100:
-    //           status = 'finish';
-    //           message = 'begin idle';
-    //           break;
-    //       }
-
-    //       this.broadcast(this.clients(), 'progress', { status, message, value });
-    //     }
-    //   });
-
-    //   // @ts-expect-error
-    //   progress.apply(compiler);
-    // }
+      // @ts-expect-error
+      progress.apply(compiler);
+    }
   }
 
   clients(): Set<WebSocket> {
