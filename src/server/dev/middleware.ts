@@ -78,7 +78,7 @@ export function middleware(context: Context): Middleware {
 
       // Try to respond.
       for (const [publicPath, service] of services) {
-        if (await service.response(ctx, publicPath)) {
+        if (await service.respond(ctx, publicPath)) {
           return;
         }
       }
