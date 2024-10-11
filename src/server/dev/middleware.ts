@@ -64,10 +64,10 @@ function getFileServicesAsync(context: Context): Promise<FileService[]> {
 export function middleware(context: Context): Middleware {
   // Middleware.
   return async (ctx, next) => {
-    const path = decodeURI(ctx.path);
+    const pathname = decodeURI(ctx.path);
 
-    // Path -1 or null byte(s).
-    if (path === -1 || path.includes('\0')) {
+    // Pathname decode failed or includes null byte(s).
+    if (pathname === -1 || pathname.includes('\0')) {
       return ctx.throw(400);
     }
 
@@ -78,7 +78,7 @@ export function middleware(context: Context): Middleware {
 
       // Try to respond.
       for (const [publicPath, service] of services) {
-        if (await service.respond(ctx, publicPath)) {
+        if (await service.respond(pathname, ctx, publicPath)) {
           return;
         }
       }

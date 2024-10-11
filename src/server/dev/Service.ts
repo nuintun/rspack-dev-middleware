@@ -214,13 +214,11 @@ export class Service {
    * @public
    * @method respond
    * @description Respond file.
+   * @param pathname The pathname.
    * @param context The koa context.
    * @param publicPath The public path.
    */
-  public async respond(context: Context, publicPath: string): Promise<boolean> {
-    // Get request pathname.
-    const pathname = context.path || '/';
-
+  public async respond(pathname: string, context: Context, publicPath: string): Promise<boolean> {
     // Check public path.
     if (!pathname.startsWith(publicPath)) {
       return false;
