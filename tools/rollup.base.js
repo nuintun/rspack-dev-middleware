@@ -2,13 +2,13 @@
  * @module rollup.base
  */
 
+import url from '@rollup/plugin-url';
 import metaURL from './plugins/meta-url.js';
 import replace from '@rollup/plugin-replace';
 import treeShake from './plugins/tree-shake.js';
 import webpackHot from './plugins/webpack-hot.js';
-import { createRequire, isBuiltin } from 'module';
 import typescript from '@rollup/plugin-typescript';
-import url from '@rollup/plugin-url';
+import { createRequire, isBuiltin } from 'node:module';
 
 const pkg = createRequire(import.meta.url)('../package.json');
 

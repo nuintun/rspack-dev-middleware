@@ -4,8 +4,8 @@
  */
 
 import Koa from 'koa';
-import path from 'path';
 import memfs from 'memfs';
+import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
 import dev from 'rspack-dev-middleware';

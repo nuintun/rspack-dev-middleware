@@ -4,8 +4,9 @@
 
 import { Context } from 'koa';
 import rspack from '@rspack/core';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { Buffer } from 'node:buffer';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import WebSocket, { WebSocketServer } from 'ws';
 import { Options, PluginFactory } from './interface';
 import { getCompilers, PLUGIN_NAME } from '/server/utils';

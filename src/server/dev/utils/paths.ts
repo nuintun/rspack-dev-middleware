@@ -2,7 +2,7 @@
  * @module paths
  */
 
-import { URL } from 'url';
+import { URL } from 'node:url';
 import { unixify } from './path';
 import rspack from '@rspack/core';
 import { UnionStats } from '/server/interface';

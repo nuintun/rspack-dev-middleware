@@ -3,8 +3,8 @@
  */
 
 import rspack from '@rspack/core';
-import { ReadStream, Stats } from 'fs';
 import { GetProp } from '/server/interface';
+import { ReadStream, Stats } from 'node:fs';
 
 type PathLike = string | Buffer | URL;
 
