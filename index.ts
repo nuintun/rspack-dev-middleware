@@ -43,11 +43,11 @@ class MultipartReadStream extends Readable {
   _read(size: number): void {
     const range = this.ranges[this.currentRangeIndex];
 
-    if (range) {
+    if (range && this.fileHandle) {
       const position = range.start + this.bytesRead;
       const buffer = Buffer.alloc(Math.min(size, range.length - this.bytesRead));
 
-      this.fileHandle?.read(buffer, 0, buffer.length, position).then(
+      this.fileHandle.read(buffer, 0, buffer.length, position).then(
         ({ buffer, bytesRead }) => {
           if (bytesRead === 0) {
             this.bytesRead = 0;
