@@ -21,21 +21,11 @@ function getFileServices(context: Context, stats: UnionStats): FileService[] {
   const paths = getPaths(stats);
   const { fs, options } = context;
   const services: FileService[] = [];
-  const { etag, ignore, headers, acceptRanges, lastModified } = options;
+  const config = { highWaterMark: 65536, ...options, fs };
 
   // Get the file services.
   for (const [outputPath, publicPath] of paths) {
-    services.push([
-      publicPath,
-      new Service(outputPath, {
-        fs,
-        etag,
-        ignore,
-        headers,
-        acceptRanges,
-        lastModified
-      })
-    ]);
+    services.push([publicPath, new Service(outputPath, config)]);
   }
 
   // Cache services.
