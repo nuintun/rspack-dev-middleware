@@ -152,7 +152,7 @@ const CSS = `
 }
 `;
 
-const DEFAULT_NAME = 'webpack';
+const DEFAULT_NAME = 'rspack';
 
 const HTML = `
 <div class="${OVERLAY}">

@@ -47,8 +47,8 @@
   "keywords": [
     "dev",
     "koa",
+    "rspack",
     "server",
-    "webpack",
     "middleware"
   ],
   "author": {

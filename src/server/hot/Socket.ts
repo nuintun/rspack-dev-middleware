@@ -117,7 +117,7 @@ export class Socket {
         const params = new URLSearchParams();
 
         params.set('path', options.path);
-        params.set('name', name || 'webpack');
+        params.set('name', name || 'rspack');
         params.set('hmr', options.hmr ? 'true' : 'false');
         params.set('wss', options.wss ? 'true' : 'false');
         params.set('reload', options.reload ? 'true' : 'false');

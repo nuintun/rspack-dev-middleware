@@ -21,20 +21,20 @@ export type EnableHotMiddleware = DisableHotMiddleware & HotExpose;
 /**
  * @function server
  * @description Create koa dev server middleware.
- * @param compiler The webpack compiler instance.
+ * @param compiler The rspack compiler instance.
  */
 export default function server(compiler: UnionCompiler): EnableHotMiddleware;
 /**
  * @function server
  * @description Create koa dev server middleware.
- * @param compiler The webpack compiler instance.
+ * @param compiler The rspack compiler instance.
  * @param options Options.
  */
 export default function server(compiler: UnionCompiler, options: EnableHotOptions): EnableHotMiddleware;
 /**
  * @function server
  * @description Create koa dev server middleware.
- * @param compiler The webpack compiler instance.
+ * @param compiler The rspack compiler instance.
  * @param options Options.
  */
 export default function server(compiler: UnionCompiler, options: DisableHotOptions): DisableHotMiddleware;
