@@ -55,7 +55,7 @@ export class FileReadStream extends Readable {
    * @param options The stream options.
    */
   constructor(path: PathLike, ranges: Range[], options: Options) {
-    const { fs, encoding, highWaterMark } = options;
+    const { fs, encoding, highWaterMark = 65536 } = options;
 
     super({ encoding, highWaterMark });
 
@@ -185,7 +185,18 @@ export class FileReadStream extends Readable {
           this.destroy(readError);
         } else {
           if (bytesRead > 0) {
-            this.push(buffer.subarray(0, bytesRead));
+            if (bytesRead !== buffer.length) {
+              // Slow path. Shrink to fit.
+              // Copy instead of slice so that we don't retain
+              // large backing buffer for small reads.
+              const chunk = Buffer.allocUnsafeSlow(bytesRead);
+
+              buffer.copy(chunk, 0, 0, bytesRead);
+
+              buffer = chunk;
+            }
+
+            this.push(buffer);
 
             this.bytesRead += bytesRead;
           } else {
