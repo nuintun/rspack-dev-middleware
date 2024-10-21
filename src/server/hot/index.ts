@@ -3,7 +3,7 @@
  */
 
 import { Middleware } from 'koa';
-import { Socket } from './Socket';
+import { Socket } from './socket';
 import { Expose, Options } from './interface';
 import { UnionCompiler } from '/server/interface';
 
