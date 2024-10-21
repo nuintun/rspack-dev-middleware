@@ -1,5 +1,5 @@
 /**
- * @module socket
+ * @module Socket
  */
 
 import { Context } from 'koa';
