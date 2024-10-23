@@ -4,11 +4,11 @@
 
 import rspack from '@rspack/core';
 import supportsColor from 'supports-color';
+import { UnionStats } from '/server/interface';
 import { InitialContext } from '/server/dev/interface';
-import { StatsOptions, UnionStats } from '/server/interface';
 import { isBoolean, isMultiCompiler, isString, PLUGIN_NAME } from '/server/utils';
 
-function normalizeStatsOptions(statsOptions?: StatsOptions): rspack.StatsOptions {
+function normalizeStatsOptions(statsOptions?: rspack.StatsValue): rspack.StatsOptions {
   if (statsOptions == null) {
     return { preset: 'normal' };
   } else if (isString(statsOptions)) {
