@@ -5,7 +5,7 @@
 import rspack from '@rspack/core';
 import { FileSystem } from './utils/fs';
 import { Options as ServiceOptions, Service } from './Service';
-import { Logger, Optional, StatsOptions, UnionCompiler, UnionStats, UnionWatching } from '/server/interface';
+import { Logger, Optional, UnionCompiler, UnionStats, UnionWatching } from '/server/interface';
 
 export interface Callback {
   (stats: UnionStats): void;
@@ -26,7 +26,7 @@ export interface Expose {
 export type FileService = [publicPath: string, service: Service];
 
 export interface Options extends Optional<ServiceOptions, 'fs'> {
-  stats?: StatsOptions;
+  stats?: rspack.StatsValue;
   writeToDisk?: boolean | ((targetPath: string) => boolean);
   onCompilationDone?: (stats: UnionStats, statsOptions: Readonly<rspack.StatsOptions>) => void;
 }

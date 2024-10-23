@@ -5,8 +5,8 @@
 import { Context } from 'koa';
 import rspack from '@rspack/core';
 import { Options } from './interface';
+import { UnionCompiler } from '/server/interface';
 import { isMultiCompiler, isObject } from '/server/utils';
-import { StatsOptions, UnionCompiler } from '/server/interface';
 
 export function isUpgradable({ request }: Context): boolean {
   const upgrade = request.get('Upgrade');
@@ -56,9 +56,11 @@ export function hasIssues<T>(issues: ArrayLike<T> | undefined): boolean {
   return Array.isArray(issues) && issues.length > 0;
 }
 
-function normalizeStatsOptions(statsOptions?: StatsOptions): rspack.StatsOptions {
+function normalizeStatsOptions(statsOptions?: rspack.StatsValue): rspack.StatsOptions {
   if (!isObject(statsOptions)) {
-    statsOptions = {};
+    statsOptions = {
+      preset: statsOptions
+    };
   }
 
   return {

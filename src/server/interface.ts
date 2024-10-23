@@ -8,8 +8,6 @@ export type UnionStats = rspack.Stats | rspack.MultiStats;
 
 export type GetProp<T, P extends keyof T> = NonNullable<T[P]>;
 
-export type StatsOptions = GetProp<rspack.Configuration, 'stats'>;
-
 export type UnionCompiler = rspack.Compiler | rspack.MultiCompiler;
 
 export type Logger = ReturnType<GetProp<rspack.Compiler, 'getInfrastructureLogger'>>;
