@@ -91,7 +91,7 @@
     "@rspack/core": "^1.0.14",
     "@rspack/plugin-react-refresh": "^1.0.0",
     "@types/etag": "^1.8.3",
-    "@types/node": "^22.7.9",
+    "@types/node": "^22.8.1",
     "@types/range-parser": "^1.2.7",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -103,7 +103,7 @@
     "react-dom": "^18.3.1",
     "react-refresh": "^0.14.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.24.0",
+    "rollup": "^4.24.2",
     "tsc-alias": "^1.8.10",
     "typescript": "^5.6.3"
   },
