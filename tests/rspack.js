@@ -1,6 +1,6 @@
 /**
- * @module webpack
- * @description Webpack config
+ * @module rspack
+ * @description Rspack config
  */
 
 import Koa from 'koa';
