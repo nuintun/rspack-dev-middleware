@@ -75,7 +75,7 @@
   "dependencies": {
     "@nuintun/ansi": "^0.1.1",
     "@types/koa": "^2.15.0",
-    "@types/ws": "^8.5.12",
+    "@types/ws": "^8.5.13",
     "etag": "^1.8.1",
     "memfs": "^4.14.0",
     "range-parser": "^1.2.1",
@@ -91,7 +91,7 @@
     "@rspack/core": "^1.0.14",
     "@rspack/plugin-react-refresh": "^1.0.0",
     "@types/etag": "^1.8.3",
-    "@types/node": "^22.8.6",
+    "@types/node": "^22.8.7",
     "@types/range-parser": "^1.2.7",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
