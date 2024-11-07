@@ -2,7 +2,7 @@
  * @module message
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 
 export interface InvalidMessage {
   action: 'invalid';

@@ -3,8 +3,8 @@
  */
 
 import { Context } from 'koa';
-import rspack from '@rspack/core';
 import { Options } from './interface';
+import * as rspack from '@rspack/core';
 import { UnionCompiler } from '/server/interface';
 import { isMultiCompiler, isObject } from '/server/utils';
 

@@ -2,8 +2,8 @@
  * @module client
  */
 
-import rspack from '@rspack/core';
 import { Message } from './Message';
+import * as rspack from '@rspack/core';
 import { Overlay } from './ui/Overlay';
 import { Progress } from './ui/Progress';
 import { emit, Messages } from './events';

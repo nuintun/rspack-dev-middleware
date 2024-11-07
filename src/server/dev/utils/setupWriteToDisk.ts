@@ -2,8 +2,8 @@
  * @module setupWriteToDisk
  */
 
-import rspack from '@rspack/core';
 import { dirname } from 'node:path';
+import * as rspack from '@rspack/core';
 import { mkdir, writeFile } from 'node:fs';
 import { GetProp } from '/server/interface';
 import { InitialContext, Options } from '/server/dev/interface';

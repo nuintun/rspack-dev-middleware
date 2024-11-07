@@ -3,8 +3,8 @@
  */
 
 import { Context } from 'koa';
-import rspack from '@rspack/core';
 import { Buffer } from 'node:buffer';
+import * as rspack from '@rspack/core';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import WebSocket, { WebSocketServer } from 'ws';

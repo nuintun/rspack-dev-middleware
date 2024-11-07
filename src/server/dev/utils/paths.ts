@@ -4,7 +4,7 @@
 
 import { URL } from 'node:url';
 import { unixify } from './path';
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 import { UnionStats } from '/server/interface';
 
 type PathsItem = [

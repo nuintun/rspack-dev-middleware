@@ -2,7 +2,7 @@
  * @module interface
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 
 export type UnionStats = rspack.Stats | rspack.MultiStats;
 

@@ -2,7 +2,7 @@
  * @module interface
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 import { FileSystem } from './utils/fs';
 import { Options as ServiceOptions, Service } from './Service';
 import { Logger, Optional, UnionCompiler, UnionStats, UnionWatching } from '/server/interface';

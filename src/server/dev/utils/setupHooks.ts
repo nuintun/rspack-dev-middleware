@@ -2,7 +2,7 @@
  * @module setupHooks
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 import supportsColor from 'supports-color';
 import { UnionStats } from '/server/interface';
 import { InitialContext } from '/server/dev/interface';

@@ -2,7 +2,7 @@
  * @module utils
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 import { UnionCompiler } from './interface';
 
 const { toString } = Object.prototype;

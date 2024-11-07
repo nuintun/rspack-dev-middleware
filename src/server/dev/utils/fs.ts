@@ -2,8 +2,8 @@
  * @module fs
  */
 
-import rspack from '@rspack/core';
 import fs, { Stats } from 'node:fs';
+import * as rspack from '@rspack/core';
 import { GetProp } from '/server/interface';
 import { createFsFromVolume, Volume } from 'memfs';
 

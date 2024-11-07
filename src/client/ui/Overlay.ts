@@ -3,7 +3,7 @@
  * @see https://github.com/shellscape/webpack-plugin-serve
  */
 
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 import { ansiToHTML, appendHTML, getRootElement, injectCSS } from './utils';
 
 const OVERLAY = 'rdm-overlay';

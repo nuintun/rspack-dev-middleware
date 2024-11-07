@@ -3,7 +3,7 @@
  */
 
 import WebSocket from 'ws';
-import rspack from '@rspack/core';
+import * as rspack from '@rspack/core';
 
 export interface Options {
   hmr?: boolean;
