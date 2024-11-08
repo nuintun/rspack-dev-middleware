@@ -145,13 +145,15 @@ export default function createClient(options: Options): void {
       }
     };
 
-    ws.onclose = (): void => {
+    ws.onclose = (event: CloseEvent): void => {
       overlay.hide();
       progress.hide();
 
-      setTimeout((): void => {
-        createWebSocket(url);
-      }, RETRY_INTERVAL);
+      if (!event.wasClean) {
+        setTimeout((): void => {
+          createWebSocket(url);
+        }, RETRY_INTERVAL);
+      }
     };
   };
 
