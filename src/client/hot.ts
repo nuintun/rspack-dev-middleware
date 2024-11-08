@@ -20,26 +20,26 @@ export function isUpdateAvailable(): boolean {
 }
 
 /**
- * @function setHash
- * @description Set webpack hash.
+ * @function updateHash
+ * @description Update webpack hash.
  * @param value The new hash value.
  */
-export function setHash(value: string): void {
+export function updateHash(value: string): void {
   hash = value;
 }
 
 /**
- * @function setStatus
- * @description Set hot status.
+ * @function updateStatus
+ * @description Update hot status.
  * @param value The new status of the hot update.
  */
-export function setStatus(value: HotUpdateStatus): void {
+export function updateStatus(value: HotUpdateStatus): void {
   status = value;
 }
 
 // Initialize status.
 if (import.meta.webpackHot) {
-  setStatus(import.meta.webpackHot.status());
+  updateStatus(import.meta.webpackHot.status());
 }
 
 /**
@@ -55,15 +55,15 @@ export function applyUpdate(hmr: boolean, fallback: (error?: Error) => void): vo
     if (hmr && import.meta.webpackHot) {
       switch (status) {
         case 'idle':
-          // Set status.
-          setStatus('check');
+          // Update status.
+          updateStatus('check');
 
           // Auto check and apply updates.
           import.meta.webpackHot
             .check(true)
             .then(updated => {
               // Update status.
-              setStatus(import.meta.webpackHot.status());
+              updateStatus(import.meta.webpackHot.status());
 
               // When updated modules is available,
               // it indicates server is ready to serve new bundle.
@@ -80,9 +80,9 @@ export function applyUpdate(hmr: boolean, fallback: (error?: Error) => void): vo
               switch (status) {
                 case 'fail':
                 case 'abort':
-                  setStatus(status);
+                  updateStatus(status);
                 default:
-                  setStatus('fail');
+                  updateStatus('fail');
               }
 
               // Cache error.

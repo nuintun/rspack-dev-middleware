@@ -2,6 +2,7 @@
  * @module global.d.ts
  */
 
+/// <reference types="@types/node" />
 /// <reference types="@rspack/core/module" />
 
 declare module '*.svg' {

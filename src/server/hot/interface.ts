@@ -14,11 +14,11 @@ export interface Options {
   progress?: boolean;
 }
 
-export interface PluginFactory {
-  (compiler: rspack.Compiler): rspack.RspackPluginInstance;
-}
+export type Clients = Set<WebSocket>;
 
-export interface Expose {
-  readonly clients: () => Set<WebSocket>;
-  readonly broadcast: <T>(clients: Set<WebSocket> | WebSocket[], action: string, payload: T) => void;
+export interface CompilerContext {
+  percentage: number;
+  readonly uuid: string;
+  readonly clients: Clients;
+  stats: Required<rspack.StatsCompilation> | null;
 }

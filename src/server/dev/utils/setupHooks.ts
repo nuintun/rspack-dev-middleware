@@ -30,7 +30,7 @@ function getStatsOptions(context: InitialContext): rspack.StatsOptions {
   const { compiler } = context;
   const { stats } = context.options;
 
-  if (stats) {
+  if (stats != null) {
     if (isMultiCompiler(compiler)) {
       return {
         children: compiler.compilers.map(() => {
@@ -60,9 +60,7 @@ export function setupHooks(context: InitialContext): void {
   const invalid = (): void => {
     // We are now in invalid state.
     context.stats = null;
-  };
 
-  const watchRun = (): void => {
     // Log compilation starting.
     context.logger.log('compilation starting...');
   };
@@ -110,5 +108,4 @@ export function setupHooks(context: InitialContext): void {
 
   hooks.done.tap(PLUGIN_NAME, done);
   hooks.invalid.tap(PLUGIN_NAME, invalid);
-  hooks.watchRun.tap(PLUGIN_NAME, watchRun);
 }

@@ -49,6 +49,7 @@ const getOptions = (): Options => {
   const params = new URLSearchParams(__resourceQuery);
 
   return {
+    uuid: params.get('uuid'),
     origin: getOrigin(params),
     hmr: params.get('hmr') !== 'false',
     path: params.get('path') || '/hot',

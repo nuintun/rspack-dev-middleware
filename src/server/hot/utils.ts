@@ -3,37 +3,17 @@
  */
 
 import { Context } from 'koa';
+import { URL } from 'node:url';
 import { Options } from './interface';
 import * as rspack from '@rspack/core';
-import { UnionCompiler } from '/server/interface';
-import { isMultiCompiler, isObject } from '/server/utils';
+import { isBoolean, isString } from '/server/utils';
+
+export const BASE_URL = 'wss://127.0.0.1';
 
 export function isUpgradable({ request }: Context): boolean {
   const upgrade = request.get('Upgrade');
 
   return !!upgrade && /^websocket$/i.test(upgrade.trim());
-}
-
-function normalize(path: string): string {
-  const segments: string[] = [];
-  const parts = path.split(/[\\/]+/);
-
-  for (const segment of parts) {
-    switch (segment) {
-      case '.':
-        break;
-      case '..':
-        segments.pop();
-        break;
-      default:
-        segments.push(segment);
-        break;
-    }
-  }
-
-  const pathname = segments.join('/');
-
-  return pathname.startsWith('/') ? pathname : `/${pathname}`;
 }
 
 export function getOptions(options?: Options): Required<Options> {
@@ -47,7 +27,7 @@ export function getOptions(options?: Options): Required<Options> {
     ...options
   };
 
-  settings.path = normalize(settings.path);
+  settings.path = new URL(settings.path, BASE_URL).pathname;
 
   return settings;
 }
@@ -56,11 +36,13 @@ export function hasIssues<T>(issues: ArrayLike<T> | undefined): boolean {
   return Array.isArray(issues) && issues.length > 0;
 }
 
-function normalizeStatsOptions(statsOptions?: rspack.StatsValue): rspack.StatsOptions {
-  if (!isObject(statsOptions)) {
-    statsOptions = {
-      preset: statsOptions
-    };
+export function getStatsOptions(compiler: rspack.Compiler): rspack.StatsOptions {
+  let statsOptions = compiler.options.stats;
+
+  if (isString(statsOptions)) {
+    statsOptions = { preset: statsOptions };
+  } else if (isBoolean(statsOptions)) {
+    statsOptions = statsOptions ? { preset: 'normal' } : { preset: 'none' };
   }
 
   return {
@@ -74,18 +56,6 @@ function normalizeStatsOptions(statsOptions?: rspack.StatsValue): rspack.StatsOp
     warnings: true,
     errorDetails: false
   };
-}
-
-export function getStatsOptions(compiler: UnionCompiler): rspack.StatsOptions {
-  if (isMultiCompiler(compiler)) {
-    return {
-      children: compiler.compilers.map(({ options }) => {
-        return normalizeStatsOptions(options.stats);
-      })
-    } as unknown as rspack.StatsOptions;
-  }
-
-  return normalizeStatsOptions(compiler.options.stats);
 }
 
 export function getTimestamp({ builtAt, children = [] }: rspack.StatsCompilation): number {

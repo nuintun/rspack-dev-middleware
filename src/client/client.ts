@@ -2,13 +2,13 @@
  * @module client
  */
 
-import { Message } from './Message';
+import { emit } from './events';
 import * as rspack from '@rspack/core';
 import { Overlay } from './ui/Overlay';
 import { Progress } from './ui/Progress';
-import { emit, Messages } from './events';
 import { GetProp } from '/server/interface';
-import { applyUpdate, setHash } from './hot';
+import { applyUpdate, updateHash } from './hot';
+import { Message, Messages } from '/server/hot/Message';
 
 export interface Options {
   readonly hmr: boolean;
@@ -18,6 +18,7 @@ export interface Options {
   readonly reload: boolean;
   readonly overlay: boolean;
   readonly progress: boolean;
+  readonly uuid: string | null;
 }
 
 export default function createClient(options: Options): void {
@@ -59,7 +60,7 @@ export default function createClient(options: Options): void {
   };
 
   const onHash = ({ hash }: GetProp<Messages, 'hash'>): void => {
-    setHash(hash);
+    updateHash(hash);
   };
 
   const setIssues = (type: 'errors' | 'warnings', issues: rspack.StatsError[]): void => {
@@ -154,5 +155,9 @@ export default function createClient(options: Options): void {
     };
   };
 
-  createWebSocket(`${options.origin}${options.path}`);
+  const { uuid } = options;
+
+  if (uuid) {
+    createWebSocket(`${options.origin}${options.path}?uuid=${uuid}`);
+  }
 }
