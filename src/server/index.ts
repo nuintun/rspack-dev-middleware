@@ -20,7 +20,8 @@ export type Options = DevOptions & { hot?: HotOptions | false };
  */
 export default function server(compiler: UnionCompiler, options: Options = {}): Middleware & Expose {
   validate(schema, options, {
-    name: PLUGIN_NAME
+    name: PLUGIN_NAME,
+    baseDataPath: 'options'
   });
 
   const { hot: hotOptions } = options;
@@ -31,8 +32,8 @@ export default function server(compiler: UnionCompiler, options: Options = {}): 
 
   // All plugins must be initialized before watching.
   // Because dev will start watching, so call hot before dev.
-  const devMiddleware = dev(compiler, options);
   const hotMiddleware = hot(compiler, hotOptions);
+  const devMiddleware = dev(compiler, options);
   const middleware = compose(devMiddleware, hotMiddleware);
 
   return Object.assign(middleware, devMiddleware, hotMiddleware);

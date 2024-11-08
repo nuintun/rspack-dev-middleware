@@ -66,7 +66,7 @@ export function setupHooks(context: InitialContext): void {
   };
 
   const {
-    onCompilationDone = (stats: UnionStats, statsOptions: rspack.StatsOptions) => {
+    onCompilationDone = (stats: UnionStats, statsOptions: rspack.StatsOptions): void => {
       const printedStats = stats.toString(statsOptions);
 
       // Avoid extra empty line when `stats: 'none'`.
