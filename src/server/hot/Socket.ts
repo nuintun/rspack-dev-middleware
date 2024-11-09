@@ -168,10 +168,10 @@ export class Socket {
             this.#broadcastStats(clients, stats);
           }
         } else {
-          client.close(1011, 'compiler not found');
+          client.close(4001, 'compiler not found');
         }
       } else {
-        client.close(1011, 'uuid not found');
+        client.close(4000, 'uuid not found');
       }
     });
 
