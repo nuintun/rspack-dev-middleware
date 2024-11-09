@@ -2,7 +2,6 @@
  * @module global.d.ts
  */
 
-/// <reference types="@types/node" />
 /// <reference types="@rspack/core/module" />
 
 declare module '*.svg' {
@@ -10,6 +9,8 @@ declare module '*.svg' {
 
   export = content;
 }
+
+declare const __ESM__: boolean;
 
 declare const __HOT_CLIENT__: string;
 

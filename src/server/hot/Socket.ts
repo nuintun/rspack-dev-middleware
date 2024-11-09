@@ -18,11 +18,7 @@ import { BASE_URL, getOptions, getStatsOptions, getTimestamp, hasIssues, isUpgra
 function entrypoint(): string {
   const filename = import.meta.url;
 
-  try {
-    return dirname(fileURLToPath(filename));
-  } catch {
-    return dirname(filename);
-  }
+  return dirname(__ESM__ ? fileURLToPath(filename) : filename);
 }
 
 const client = resolve(entrypoint(), __HOT_CLIENT__);
