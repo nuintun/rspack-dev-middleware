@@ -149,19 +149,18 @@ export default function createClient(options: Options): void {
       overlay.hide();
       progress.hide();
 
-      if (!event.wasClean) {
-        switch (event.code) {
-          case 4000:
-          case 4001:
-            self.location.reload();
-            break;
-          default:
-            if (!event.wasClean) {
-              setTimeout((): void => {
-                createWebSocket(url);
-              }, RETRY_INTERVAL);
-            }
-        }
+      switch (event.code) {
+        case 4000:
+        case 4001:
+          self.location.reload();
+          break;
+        default:
+          if (!event.wasClean) {
+            setTimeout((): void => {
+              createWebSocket(url);
+            }, RETRY_INTERVAL);
+          }
+          break;
       }
     };
   };
