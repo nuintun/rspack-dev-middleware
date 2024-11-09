@@ -152,7 +152,7 @@ export default function createClient(options: Options): void {
       switch (event.code) {
         case 4000:
         case 4001:
-          self.location.reload();
+          fallback();
           break;
         default:
           if (!event.wasClean) {

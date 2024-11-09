@@ -180,26 +180,6 @@ export class Socket {
     });
   }
 
-  public upgrade(context: Context): boolean {
-    const server = this.#server;
-    const { req: request } = context;
-
-    if (isUpgradable(context) && server.shouldHandle(request)) {
-      context.respond = false;
-
-      const { socket } = context;
-      const head = Buffer.alloc(0);
-
-      server.handleUpgrade(request, socket, head, client => {
-        server.emit('connection', client, request);
-      });
-
-      return true;
-    }
-
-    return false;
-  }
-
   #broadcast<A extends keyof Messages>(clients: Clients, action: A, payload: GetProp<Messages, A>): void {
     for (const client of clients) {
       if (client.readyState === WebSocket.OPEN) {
@@ -220,5 +200,25 @@ export class Socket {
         this.#broadcast(clients, 'ok', { timestamp });
       }
     }
+  }
+
+  public upgrade(context: Context): boolean {
+    const server = this.#server;
+    const { req: request } = context;
+
+    if (isUpgradable(context) && server.shouldHandle(request)) {
+      context.respond = false;
+
+      const { socket } = context;
+      const head = Buffer.alloc(0);
+
+      server.handleUpgrade(request, socket, head, client => {
+        server.emit('connection', client, request);
+      });
+
+      return true;
+    }
+
+    return false;
   }
 }
