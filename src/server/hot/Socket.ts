@@ -3,13 +3,12 @@
  */
 
 import { Context } from 'koa';
-import { URL } from 'node:url';
 import { v7 as uuid7 } from 'uuid';
 import { Buffer } from 'node:buffer';
 import { Messages } from './Message';
 import * as rspack from '@rspack/core';
-import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath, URL } from 'node:url';
 import WebSocket, { WebSocketServer } from 'ws';
 import { getCompilers, PLUGIN_NAME } from '/server/utils';
 import { Clients, CompilerContext, Options } from './interface';
