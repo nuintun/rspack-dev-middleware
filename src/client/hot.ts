@@ -13,10 +13,24 @@ let status: HotUpdateStatus = 'idle';
  * @function isUpdateAvailable
  * @description Is there a newer version of this code available.
  */
-export function isUpdateAvailable(): boolean {
+function isUpdateAvailable(): boolean {
   // __webpack_hash__ is the hash of the current compilation.
   // It's a global variable injected by webpack.
   return hash !== __webpack_hash__;
+}
+
+/**
+ * @function updateStatus
+ * @description Update hot status.
+ * @param value The new status of the hot update.
+ */
+function updateStatus(value: HotUpdateStatus): void {
+  status = value;
+}
+
+// Initialize status.
+if (import.meta.webpackHot) {
+  updateStatus(import.meta.webpackHot.status());
 }
 
 /**
@@ -26,20 +40,6 @@ export function isUpdateAvailable(): boolean {
  */
 export function updateHash(value: string): void {
   hash = value;
-}
-
-/**
- * @function updateStatus
- * @description Update hot status.
- * @param value The new status of the hot update.
- */
-export function updateStatus(value: HotUpdateStatus): void {
-  status = value;
-}
-
-// Initialize status.
-if (import.meta.webpackHot) {
-  updateStatus(import.meta.webpackHot.status());
 }
 
 /**
