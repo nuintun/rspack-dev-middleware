@@ -7,9 +7,7 @@ import * as rspack from '@rspack/core';
 import { GetProp } from '/server/interface';
 import { createFsFromVolume, Volume } from 'memfs';
 
-type Compiler = rspack.Compiler;
-
-export interface FileSystem extends GetProp<Compiler, 'outputFileSystem'> {
+export interface FileSystem extends GetProp<rspack.Compiler, 'outputFileSystem'> {
   stat: typeof fs.stat;
   open: typeof fs.open;
   read: typeof fs.read;
