@@ -12,7 +12,6 @@ import dev from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');
-const entryHTML1 = path.resolve('wwwroot/index-1.html');
 
 function createMemfs() {
   const volume = new memfs.Volume();
@@ -35,189 +34,95 @@ const html = {
   meta: { 'theme-color': '#4285f4', viewport: 'width=device-width,initial-scale=1.0' }
 };
 
-const compiler = rspack([
-  {
-    name: 'react',
-    mode: 'development',
-    context: path.resolve('src'),
-    entry: path.resolve('src/index.tsx'),
-    output: {
-      publicPath: '/public/',
-      filename: `js/[name].js`,
-      chunkFilename: `js/[name].js`,
-      path: path.resolve('wwwroot/public'),
-      assetModuleFilename: `[path][name][ext]`
+const compiler = rspack({
+  name: 'react',
+  mode: 'development',
+  context: path.resolve('src'),
+  entry: path.resolve('src/index.tsx'),
+  output: {
+    publicPath: '/public/',
+    filename: `js/[name].js`,
+    chunkFilename: `js/[name].js`,
+    path: path.resolve('wwwroot/public'),
+    assetModuleFilename: `[path][name][ext]`
+  },
+  experiments: {
+    css: true
+  },
+  watchOptions: {
+    aggregateTimeout: 256
+  },
+  stats: {
+    colors: true,
+    chunks: false,
+    children: false,
+    entrypoints: false,
+    runtimeModules: false,
+    dependentModules: false
+  },
+  devtool: 'eval-cheap-module-source-map',
+  resolve: {
+    fallback: { url: false },
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  },
+  module: {
+    parser: {
+      'css/auto': {
+        namedExports: true
+      }
     },
-    experiments: {
-      css: true
+    generator: {
+      'css/auto': {
+        localIdentName: '[local]-[hash:8]',
+        exportsConvention: 'camel-case-only'
+      }
     },
-    watchOptions: {
-      aggregateTimeout: 256
-    },
-    stats: {
-      colors: true,
-      chunks: false,
-      children: false,
-      entrypoints: false,
-      runtimeModules: false,
-      dependentModules: false
-    },
-    devtool: 'eval-cheap-module-source-map',
-    resolve: {
-      fallback: { url: false },
-      extensions: ['.ts', '.tsx', '.js', '.jsx']
-    },
-    module: {
-      parser: {
-        'css/auto': {
-          namedExports: true
-        }
-      },
-      generator: {
-        'css/auto': {
-          localIdentName: '[local]-[hash:8]',
-          exportsConvention: 'camel-case-only'
-        }
-      },
-      rules: [
-        {
-          test: /\.[jt]sx?$/i,
-          type: 'javascript/auto',
-          loader: 'builtin:swc-loader',
-          exclude: /[\\/]node_modules[\\/]/,
-          options: {
-            jsc: {
-              externalHelpers: true,
-              parser: {
-                tsx: true,
-                syntax: 'typescript'
-              },
-              transform: {
-                react: {
-                  refresh: true,
-                  runtime: 'automatic'
-                }
-              }
+    rules: [
+      {
+        test: /\.[jt]sx?$/i,
+        type: 'javascript/auto',
+        loader: 'builtin:swc-loader',
+        exclude: /[\\/]node_modules[\\/]/,
+        options: {
+          jsc: {
+            externalHelpers: true,
+            parser: {
+              tsx: true,
+              syntax: 'typescript'
             },
-            env: {
-              targets: ['defaults', 'not IE >= 0']
+            transform: {
+              react: {
+                refresh: true,
+                runtime: 'automatic'
+              }
             }
+          },
+          env: {
+            targets: ['defaults', 'not IE >= 0']
           }
-        },
-        {
-          test: /\.css$/i,
-          type: 'css/auto',
-          exclude: /[\\/]node_modules[\\/]/
-        },
-        {
-          type: 'asset/resource',
-          test: /\.(svg|png|mp4)$/i,
-          exclude: /[\\/]node_modules[\\/]/
         }
-      ]
-    },
-    plugins: [
-      new ReactRefreshPlugin(),
-      new rspack.ProgressPlugin({
-        prefix: '[Rspack]',
-        progressChars: '█▒'
-      }),
-      new rspack.HtmlRspackPlugin(html)
+      },
+      {
+        test: /\.css$/i,
+        type: 'css/auto',
+        exclude: /[\\/]node_modules[\\/]/
+      },
+      {
+        type: 'asset/resource',
+        test: /\.(svg|png|mp4)$/i,
+        exclude: /[\\/]node_modules[\\/]/
+      }
     ]
   },
-  {
-    name: 'react-1',
-    mode: 'development',
-    context: path.resolve('src'),
-    entry: path.resolve('src/index-1.tsx'),
-    output: {
-      publicPath: '/public-1/',
-      filename: `js/[name].js`,
-      chunkFilename: `js/[name].js`,
-      path: path.resolve('wwwroot/public-1'),
-      assetModuleFilename: `[path][name][ext]`
-    },
-    experiments: {
-      css: true
-    },
-    watchOptions: {
-      aggregateTimeout: 256
-    },
-    stats: {
-      colors: true,
-      chunks: false,
-      children: false,
-      entrypoints: false,
-      runtimeModules: false,
-      dependentModules: false
-    },
-    devtool: 'eval-cheap-module-source-map',
-    resolve: {
-      fallback: { url: false },
-      extensions: ['.ts', '.tsx', '.js', '.jsx']
-    },
-    module: {
-      parser: {
-        'css/auto': {
-          namedExports: true
-        }
-      },
-      generator: {
-        'css/auto': {
-          localIdentName: '[local]-[hash:8]',
-          exportsConvention: 'camel-case-only'
-        }
-      },
-      rules: [
-        {
-          test: /\.[jt]sx?$/i,
-          type: 'javascript/auto',
-          loader: 'builtin:swc-loader',
-          exclude: /[\\/]node_modules[\\/]/,
-          options: {
-            jsc: {
-              externalHelpers: true,
-              parser: {
-                tsx: true,
-                syntax: 'typescript'
-              },
-              transform: {
-                react: {
-                  refresh: true,
-                  runtime: 'automatic'
-                }
-              }
-            },
-            env: {
-              targets: ['defaults', 'not IE >= 0']
-            }
-          }
-        },
-        {
-          test: /\.css$/i,
-          type: 'css/auto',
-          exclude: /[\\/]node_modules[\\/]/
-        },
-        {
-          type: 'asset/resource',
-          test: /\.(svg|png|mp4)$/i,
-          exclude: /[\\/]node_modules[\\/]/
-        }
-      ]
-    },
-    plugins: [
-      new ReactRefreshPlugin(),
-      new rspack.ProgressPlugin({
-        prefix: '[Rspack]',
-        progressChars: '█▒'
-      }),
-      new rspack.HtmlRspackPlugin({
-        ...html,
-        filename: entryHTML1
-      })
-    ]
-  }
-]);
+  plugins: [
+    new ReactRefreshPlugin(),
+    new rspack.ProgressPlugin({
+      prefix: '[Rspack]',
+      progressChars: '█▒'
+    }),
+    new rspack.HtmlRspackPlugin(html)
+  ]
+});
 
 const port = 8000;
 const app = new Koa();
@@ -240,12 +145,7 @@ app.use(server);
 
 app.use(async ctx => {
   ctx.type = 'text/html; charset=utf-8';
-
-  if (!ctx.path.includes('index-1.html')) {
-    ctx.body = fs.createReadStream(entryHTML);
-  } else {
-    ctx.body = fs.createReadStream(entryHTML1);
-  }
+  ctx.body = fs.createReadStream(entryHTML);
 });
 
 app.on('error', error => {
