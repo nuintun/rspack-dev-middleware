@@ -166,8 +166,12 @@ export default function createClient(options: Options): void {
   };
 
   const { uuid } = options;
+  const url = `${options.origin}${options.path}`;
+  const input = new URL(url, self.location.href);
 
   if (uuid) {
-    createWebSocket(`${options.origin}${options.path}?uuid=${uuid}`);
+    input.searchParams.set('uuid', uuid);
   }
+
+  createWebSocket(input.href);
 }
