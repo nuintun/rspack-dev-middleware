@@ -4,9 +4,9 @@
 
 import { Context } from 'koa';
 import { URL } from 'node:url';
-import { Options } from './interface';
 import * as rspack from '@rspack/core';
 import { isBoolean, isString } from '/server/utils';
+import { NormalizedOptions, Options } from './interface';
 
 export const BASE_URL = 'wss://127.0.0.1';
 
@@ -16,10 +16,9 @@ export function isUpgradable({ request }: Context): boolean {
   return !!upgrade && /^websocket$/i.test(upgrade.trim());
 }
 
-export function getOptions(options?: Options): Required<Options> {
+export function getOptions(options?: Options): NormalizedOptions {
   const settings = {
     hmr: true,
-    wss: false,
     path: '/hot',
     reload: true,
     overlay: true,

@@ -166,8 +166,7 @@ export default function createClient(options: Options): void {
   };
 
   const { uuid } = options;
-  const url = `${options.origin}${options.path}`;
-  const input = new URL(url, self.location.href);
+  const input = new URL(`${options.origin}${options.path}`);
 
   if (uuid) {
     input.searchParams.set('uuid', uuid);

@@ -10,6 +10,8 @@ export type GetProp<T, P extends keyof T> = NonNullable<T[P]>;
 
 export type UnionCompiler = rspack.Compiler | rspack.MultiCompiler;
 
+export type RequiredKeys<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
 export type Logger = ReturnType<GetProp<rspack.Compiler, 'getInfrastructureLogger'>>;
 
 export type UnionWatching = rspack.Watching | ReturnType<GetProp<rspack.MultiCompiler, 'watch'>>;

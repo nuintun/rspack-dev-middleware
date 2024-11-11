@@ -11,8 +11,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import WebSocket, { WebSocketServer } from 'ws';
 import { getCompilers, PLUGIN_NAME } from '/server/utils';
-import { Clients, CompilerContext, Options } from './interface';
 import { GetProp, Logger, UnionCompiler } from '/server/interface';
+import { Clients, CompilerContext, NormalizedOptions, Options } from './interface';
 import { BASE_URL, getOptions, getStatsOptions, getTimestamp, hasIssues, isUpgradable } from './utils';
 
 function entrypoint(): string {
@@ -27,7 +27,7 @@ export class Socket {
   // Readonly props.
   readonly #logger: Logger;
   readonly #server: WebSocketServer;
-  readonly #options: Required<Options>;
+  readonly #options: NormalizedOptions;
 
   constructor(compiler: UnionCompiler, options?: Options) {
     this.#options = getOptions(options);
@@ -99,9 +99,15 @@ export class Socket {
 
     params.set('uuid', context.uuid);
     params.set('path', options.path);
+
+    const { wss } = options;
+
+    if (wss != null) {
+      params.set('wss', wss ? 'true' : 'false');
+    }
+
     params.set('name', compiler.name || 'rspack');
     params.set('hmr', options.hmr ? 'true' : 'false');
-    params.set('wss', options.wss ? 'true' : 'false');
     params.set('reload', options.reload ? 'true' : 'false');
     params.set('overlay', options.overlay ? 'true' : 'false');
     params.set('progress', options.progress ? 'true' : 'false');
