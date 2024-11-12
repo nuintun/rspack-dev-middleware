@@ -35,7 +35,7 @@ const html = {
 };
 
 const compiler = rspack({
-  name: 'react',
+  name: 'React',
   mode: 'development',
   context: path.resolve('src'),
   entry: path.resolve('src/index.tsx'),
