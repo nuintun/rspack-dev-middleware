@@ -18,13 +18,14 @@ class AbortError extends Error {
   }
 }
 
-export function letUserSelectCaptureArea(): Promise<DOMRectReadOnly> {
+export function selectCaptureArea(): Promise<DOMRectReadOnly> {
   return new Promise<DOMRectReadOnly>((resolve, reject) => {
     let startX = 0;
     let startY = 0;
     let capturing = false;
 
     const namespace = 'http://www.w3.org/2000/svg';
+    const stage = document.createElement('svg-screenshot');
     const svg = document.createElementNS(namespace, 'svg');
 
     svg.style.top = '0px';
@@ -146,7 +147,7 @@ export function letUserSelectCaptureArea(): Promise<DOMRectReadOnly> {
       svg.removeEventListener('mousemove', mousemove);
       svg.removeEventListener('mouseup', mouseup);
 
-      svg.remove();
+      stage.remove();
     };
 
     window.addEventListener('keyup', escape);
@@ -159,6 +160,9 @@ export function letUserSelectCaptureArea(): Promise<DOMRectReadOnly> {
 
     mask.append(background, cutout);
     svg.append(mask, backdrop);
-    document.body.append(svg);
+
+    stage.attachShadow({ mode: 'closed' }).append(svg);
+
+    document.body.append(stage);
   });
 }

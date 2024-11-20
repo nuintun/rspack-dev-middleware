@@ -1,18 +1,33 @@
 import * as styles from './css/App.module.css';
 
 import { memo, useEffect } from 'react';
-import { letUserSelectCaptureArea } from './capture';
+import { selectCaptureArea } from './capture';
 
 import logo from './images/react.svg';
 import github from './videos/github.mp4';
 
 export default memo(function App() {
   useEffect(() => {
-    const capture = async (event: KeyboardEvent) => {
-      if (event.altKey && event.ctrlKey && event.key === 'a') {
+    let capturing = false;
+
+    const capture = (event: KeyboardEvent) => {
+      if (!capturing && event.altKey && event.ctrlKey && event.key === 'a') {
+        capturing = true;
+
         event.preventDefault();
 
-        console.log(await letUserSelectCaptureArea());
+        selectCaptureArea()
+          .then(
+            rect => {
+              console.log(rect);
+            },
+            error => {
+              console.error(error);
+            }
+          )
+          .finally(() => {
+            capturing = false;
+          });
       }
     };
 
