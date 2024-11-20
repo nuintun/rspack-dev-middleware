@@ -44,11 +44,15 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
     background.setAttribute('x', '0');
     background.setAttribute('y', '0');
-    background.setAttribute('fill', 'white');
+    background.setAttribute('fill', '#fff');
 
     const cutout = document.createElementNS(namespace, 'rect');
 
-    cutout.setAttribute('fill', 'black');
+    cutout.setAttribute('x', '0');
+    cutout.setAttribute('y', '0');
+    cutout.setAttribute('width', '0');
+    cutout.setAttribute('height', '0');
+    cutout.setAttribute('fill', '#000');
 
     const backdrop = document.createElementNS(namespace, 'rect');
 
