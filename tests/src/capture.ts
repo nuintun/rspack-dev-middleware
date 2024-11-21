@@ -29,6 +29,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       let startY = 0;
       let capturing = false;
 
+      const { documentElement } = document;
       const namespace = 'http://www.w3.org/2000/svg';
       const stage = document.createElement('svg-screenshot');
       const svg = document.createElementNS(namespace, 'svg');
@@ -67,8 +68,6 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       backdrop.setAttribute('mask', 'url(#svg-screenshot-cutout)');
 
       const observer = new ResizeObserver(entries => {
-        const { documentElement } = document;
-
         for (const { target } of entries) {
           if (target === documentElement) {
             const width = documentElement.clientWidth.toString();
@@ -117,14 +116,14 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
           event.preventDefault();
 
           const { clientX, clientY } = event;
+          const { clientWidth, clientHeight } = documentElement;
+          const width = Math.min(clientWidth, Math.abs(clientX - startX));
+          const height = Math.min(clientHeight, Math.abs(clientY - startY));
 
-          const positionX = Math.min(startX, clientX);
-          const positionY = Math.min(startY, clientY);
-
-          cutout.setAttribute('x', positionX.toString());
-          cutout.setAttribute('y', positionY.toString());
-          cutout.setAttribute('width', Math.abs(clientX - startX).toString());
-          cutout.setAttribute('height', Math.abs(clientY - startY).toString());
+          cutout.setAttribute('width', width.toString());
+          cutout.setAttribute('height', height.toString());
+          cutout.setAttribute('x', Math.min(startX, clientX).toString());
+          cutout.setAttribute('y', Math.min(startY, clientY).toString());
         }
       };
 
@@ -149,7 +148,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
         promise = null;
         capturing = false;
 
-        observer.unobserve(document.documentElement);
+        observer.unobserve(documentElement);
 
         window.removeEventListener('keyup', escape, true);
         window.removeEventListener('mousedown', mousedown, true);
@@ -159,7 +158,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
         stage.remove();
       };
 
-      observer.observe(document.documentElement);
+      observer.observe(documentElement);
 
       window.addEventListener('keyup', escape, true);
       window.addEventListener('mousedown', mousedown, true);
