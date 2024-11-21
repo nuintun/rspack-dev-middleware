@@ -19,6 +19,12 @@ declare module '*.css' {
   export = content;
 }
 
+declare module '*.cur' {
+  const content: string;
+
+  export = content;
+}
+
 declare module '*.svg' {
   const content: string;
 
