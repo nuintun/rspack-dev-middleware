@@ -128,18 +128,18 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
     const mouseup: MouseEventHandler = event => {
       event.preventDefault();
 
-      cleanup();
-
       // Note: Need to build the DOMRect from the properties,
       // getBoundingClientRect() returns collapsed rectangle in Firefox.
-      resolve(
-        new DOMRectReadOnly(
-          cutout.x.baseVal.value,
-          cutout.y.baseVal.value,
-          cutout.width.baseVal.value,
-          cutout.height.baseVal.value
-        )
+      const rect = new DOMRectReadOnly(
+        cutout.x.baseVal.value,
+        cutout.y.baseVal.value,
+        cutout.width.baseVal.value,
+        cutout.height.baseVal.value
       );
+
+      cleanup();
+
+      resolve(rect);
     };
 
     const cleanup = () => {
