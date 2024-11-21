@@ -36,6 +36,9 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
       svg.style.top = '0px';
       svg.style.left = '0px';
+      svg.style.margin = '0px';
+      svg.style.border = 'none';
+      svg.style.padding = '0px';
       svg.style.position = 'fixed';
       svg.style.zIndex = '2147483647';
       svg.style.cursor = `url(${cross}), auto`;
