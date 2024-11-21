@@ -33,8 +33,8 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
     svg.style.top = '0px';
     svg.style.left = '0px';
     svg.style.position = 'fixed';
-    svg.style.cursor = `url(${cross}), auto`;
     svg.style.zIndex = '2147483647';
+    svg.style.cursor = `url(${cross}), auto`;
 
     svg.id = 'svg-screenshot-selector';
 
