@@ -11,7 +11,7 @@ export default memo(function App() {
     let capturing = false;
 
     const capture = (event: KeyboardEvent) => {
-      if (!capturing && event.altKey && event.ctrlKey && event.key === 'a') {
+      if (!capturing && event.altKey && event.ctrlKey && /^a$/i.test(event.key)) {
         capturing = true;
 
         event.preventDefault();
@@ -31,10 +31,10 @@ export default memo(function App() {
       }
     };
 
-    window.addEventListener('keydown', capture);
+    window.addEventListener('keyup', capture);
 
     return () => {
-      window.removeEventListener('keydown', capture);
+      window.removeEventListener('keyup', capture);
     };
   });
 
