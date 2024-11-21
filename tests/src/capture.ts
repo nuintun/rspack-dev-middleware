@@ -147,7 +147,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
       observer.unobserve(document.documentElement);
 
-      window.removeEventListener('keyup', escape);
+      window.removeEventListener('keyup', escape, true);
 
       svg.removeEventListener('mousedown', mousedown);
       svg.removeEventListener('mousemove', mousemove);
@@ -158,7 +158,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
     observer.observe(document.documentElement);
 
-    window.addEventListener('keyup', escape);
+    window.addEventListener('keyup', escape, true);
 
     svg.addEventListener('mousedown', mousedown);
     svg.addEventListener('mousemove', mousemove);
