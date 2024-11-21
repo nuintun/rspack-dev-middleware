@@ -94,24 +94,32 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
       const escape: KeyboardEventHandler = event => {
         if (!capturing && event.key === 'Escape') {
+          event.preventDefault();
+
           cleanup();
 
           reject(new AbortError('aborted with escape'));
         }
       };
 
-      const mousedown: MouseEventHandler = event => {
+      const contextmenu: MouseEventHandler = event => {
         event.preventDefault();
+      };
 
-        capturing = true;
+      const mousedown: MouseEventHandler = event => {
+        if (event.button === 0) {
+          event.preventDefault();
 
-        startX = event.clientX;
-        startY = event.clientY;
+          capturing = true;
 
-        cutout.setAttribute('width', '0');
-        cutout.setAttribute('height', '0');
-        cutout.setAttribute('x', startX.toString());
-        cutout.setAttribute('y', startY.toString());
+          startX = event.clientX;
+          startY = event.clientY;
+
+          cutout.setAttribute('width', '0');
+          cutout.setAttribute('height', '0');
+          cutout.setAttribute('x', startX.toString());
+          cutout.setAttribute('y', startY.toString());
+        }
       };
 
       const mousemove: MouseEventHandler = event => {
@@ -131,20 +139,22 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       };
 
       const mouseup: MouseEventHandler = event => {
-        event.preventDefault();
+        if (event.button === 0) {
+          event.preventDefault();
 
-        // Note: Need to build the DOMRect from the properties,
-        // getBoundingClientRect() returns collapsed rectangle in Firefox.
-        const rect = new DOMRectReadOnly(
-          cutout.x.baseVal.value,
-          cutout.y.baseVal.value,
-          cutout.width.baseVal.value,
-          cutout.height.baseVal.value
-        );
+          // Note: Need to build the DOMRect from the properties,
+          // getBoundingClientRect() returns collapsed rectangle in Firefox.
+          const rect = new DOMRectReadOnly(
+            cutout.x.baseVal.value,
+            cutout.y.baseVal.value,
+            cutout.width.baseVal.value,
+            cutout.height.baseVal.value
+          );
 
-        cleanup();
+          cleanup();
 
-        resolve(rect);
+          resolve(rect);
+        }
       };
 
       const cleanup = () => {
@@ -154,6 +164,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
         observer.unobserve(documentElement);
 
         window.removeEventListener('keyup', escape, true);
+        window.removeEventListener('contextmenu', contextmenu, true);
         window.removeEventListener('mousedown', mousedown, true);
         window.removeEventListener('mousemove', mousemove, true);
         window.removeEventListener('mouseup', mouseup, true);
@@ -164,6 +175,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       observer.observe(documentElement);
 
       window.addEventListener('keyup', escape, true);
+      window.addEventListener('contextmenu', contextmenu, true);
       window.addEventListener('mousedown', mousedown, true);
       window.addEventListener('mousemove', mousemove, true);
       window.addEventListener('mouseup', mouseup, true);
