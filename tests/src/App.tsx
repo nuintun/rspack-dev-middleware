@@ -31,10 +31,10 @@ export default memo(function App() {
       }
     };
 
-    window.addEventListener('keyup', capture);
+    window.addEventListener('keyup', capture, true);
 
     return () => {
-      window.removeEventListener('keyup', capture);
+      window.removeEventListener('keyup', capture, true);
     };
   });
 
