@@ -156,13 +156,13 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       stage.remove();
     };
 
+    observer.observe(document.documentElement);
+
     window.addEventListener('keyup', escape);
 
     svg.addEventListener('mousedown', mousedown);
     svg.addEventListener('mousemove', mousemove);
     svg.addEventListener('mouseup', mouseup);
-
-    observer.observe(document.documentElement);
 
     mask.append(background, cutout);
     svg.append(mask, backdrop);
