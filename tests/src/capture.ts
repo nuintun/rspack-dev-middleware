@@ -62,6 +62,18 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       cutout.setAttribute('width', '0');
       cutout.setAttribute('height', '0');
       cutout.setAttribute('fill', '#000');
+      cutout.setAttribute('stroke', '#000');
+      cutout.setAttribute('stroke-width', '2');
+      cutout.setAttribute('stroke-dashoffset', '0');
+      cutout.setAttribute('stroke-dasharray', '5, 5');
+
+      const animate = document.createElementNS(namespace, 'animate');
+
+      animate.setAttribute('to', '10');
+      animate.setAttribute('from', '0');
+      animate.setAttribute('dur', '0.5s');
+      animate.setAttribute('repeatCount', 'indefinite');
+      animate.setAttribute('attributeName', 'stroke-dashoffset');
 
       const backdrop = document.createElementNS(namespace, 'rect');
 
@@ -180,6 +192,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       window.addEventListener('mousemove', mousemove, true);
       window.addEventListener('mouseup', mouseup, true);
 
+      cutout.append(animate);
       mask.append(background, cutout);
       svg.append(mask, backdrop);
 
