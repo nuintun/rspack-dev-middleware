@@ -2,7 +2,7 @@
  * @module capture
  */
 
-import cross from './images/cross.cur';
+import crosshair from './images/crosshair.cur';
 
 interface MouseEventHandler {
   (event: MouseEvent): void;
@@ -41,7 +41,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       svg.style.padding = '0px';
       svg.style.position = 'fixed';
       svg.style.zIndex = '2147483647';
-      svg.style.cursor = `url(${cross}), auto`;
+      svg.style.cursor = `url(${crosshair}) 16 16, crosshair`;
 
       svg.id = 'svg-screenshot-selector';
 
