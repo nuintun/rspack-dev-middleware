@@ -65,12 +65,12 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       cutout.setAttribute('stroke', '#fff');
       cutout.setAttribute('stroke-width', '2');
       cutout.setAttribute('stroke-dashoffset', '0');
-      cutout.setAttribute('stroke-dasharray', '5, 5');
+      cutout.setAttribute('stroke-dasharray', '6, 4');
 
       const animate = document.createElementNS(namespace, 'animate');
 
-      animate.setAttribute('to', '10');
       animate.setAttribute('from', '0');
+      animate.setAttribute('to', '-10');
       animate.setAttribute('dur', '0.5s');
       animate.setAttribute('repeatCount', 'indefinite');
       animate.setAttribute('attributeName', 'stroke-dashoffset');
