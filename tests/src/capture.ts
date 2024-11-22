@@ -62,7 +62,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       cutout.setAttribute('width', '0');
       cutout.setAttribute('height', '0');
       cutout.setAttribute('fill', '#000');
-      cutout.setAttribute('stroke', '#000');
+      cutout.setAttribute('stroke', '#fff');
       cutout.setAttribute('stroke-width', '2');
       cutout.setAttribute('stroke-dashoffset', '0');
       cutout.setAttribute('stroke-dasharray', '5, 5');
@@ -138,15 +138,14 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
         if (capturing) {
           event.preventDefault();
 
-          const { clientX, clientY } = event;
           const { clientWidth, clientHeight } = documentElement;
-          const width = Math.min(clientWidth, Math.abs(clientX - startX));
-          const height = Math.min(clientHeight, Math.abs(clientY - startY));
+          const clientX = Math.max(0, Math.min(clientWidth, event.clientX));
+          const clientY = Math.max(0, Math.min(clientHeight, event.clientY));
 
-          cutout.setAttribute('width', width.toString());
-          cutout.setAttribute('height', height.toString());
           cutout.setAttribute('x', Math.min(startX, clientX).toString());
           cutout.setAttribute('y', Math.min(startY, clientY).toString());
+          cutout.setAttribute('width', Math.abs(clientX - startX).toString());
+          cutout.setAttribute('height', Math.abs(clientY - startY).toString());
         }
       };
 
