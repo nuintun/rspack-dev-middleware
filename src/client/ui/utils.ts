@@ -138,17 +138,20 @@ export function injectCSS(
   return styleElement;
 }
 
-export function appendHTML(html: string, root: RootElement = document.body): ChildNode[] {
-  const nodes: ChildNode[] = [];
+export function appendDOMString<T extends DOMParserSupportedType>(
+  type: T,
+  string: string,
+  root: RootElement = document.body
+): NodeListOf<T extends 'image/svg+xml' ? SVGElement : HTMLElement> {
   const parser = new DOMParser();
   const fragment = document.createDocumentFragment();
-  const { body } = parser.parseFromString(html.trim(), 'text/html');
+  const { childNodes } = parser.parseFromString(string.trim(), type);
 
-  while (body.firstChild) {
-    nodes.push(fragment.appendChild(body.firstChild));
+  for (const node of childNodes) {
+    fragment.appendChild(node);
   }
 
   root.appendChild(fragment);
 
-  return nodes;
+  return childNodes as NodeListOf<T extends 'image/svg+xml' ? SVGElement : HTMLElement>;
 }

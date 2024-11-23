@@ -4,7 +4,7 @@
  */
 
 import * as rspack from '@rspack/core';
-import { ansiToHTML, appendHTML, getRootElement, injectCSS } from './utils';
+import { ansiToHTML, appendDOMString, getRootElement, injectCSS } from './utils';
 
 const OVERLAY = 'rdm-overlay';
 
@@ -185,7 +185,7 @@ export class Overlay {
 
     injectCSS(CSS, root);
 
-    const [dialog] = appendHTML(HTML, root) as [HTMLElement];
+    const [dialog] = appendDOMString('text/html', HTML, root);
 
     this.#dialog = dialog;
     this.#name = dialog.querySelector(`.${OVERLAY}-name`)!;

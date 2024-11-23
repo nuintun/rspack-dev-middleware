@@ -5,7 +5,7 @@
  */
 
 import logo from './images/rspack-logo.svg';
-import { appendHTML, getRootElement, injectCSS } from './utils';
+import { appendDOMString, getRootElement, injectCSS } from './utils';
 
 const DURATION = 256;
 const PROGRESS = 'rdm-progress';
@@ -44,8 +44,8 @@ const CSS = `
 }
 `;
 
-const HTML = `
-<svg class="${PROGRESS}" x="0" y="0" viewBox="0 0 96 96">
+const SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" class="${PROGRESS}" x="0" y="0" viewBox="0 0 96 96">
   <circle fill="#23272f" cx="50%" cy="50%" r="44" />
   <circle class="${PROGRESS}-track" cx="50%" cy="50%" r="44" />
   <image href="${logo}" x="16" y="22.053" width="64" height="49.894"/>
@@ -64,7 +64,7 @@ export class Progress {
 
     injectCSS(CSS, root);
 
-    [this.#svg] = appendHTML(HTML, root) as [SVGElement];
+    [this.#svg] = appendDOMString('image/svg+xml', SVG, root);
 
     this.#track = this.#svg.querySelector(`.${PROGRESS}-track`)!;
   }
