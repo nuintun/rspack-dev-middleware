@@ -34,6 +34,7 @@ const CSS = `
   border: none;
   position: fixed;
   box-sizing: border-box;
+  cursor: url(${crosshair}) 16 16, crosshair;
 }
 
 .${COMPONENT_NAME}-mask {
@@ -41,7 +42,6 @@ const CSS = `
   height: 100vh;
   z-index: 2147483646;
   background: transparent;
-  cursor: url(${crosshair}) 16 16, crosshair;
 }
 
 .${COMPONENT_NAME}-selection {
