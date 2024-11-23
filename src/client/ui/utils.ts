@@ -117,11 +117,11 @@ export type RootElement = HTMLElement | ShadowRoot;
 
 export function getRootElement(tagName: string): ShadowRoot {
   const stage = document.createElement(tagName);
-  const root = stage.attachShadow({ mode: 'closed' });
+  const shadowRoot = stage.attachShadow({ mode: 'closed' });
 
   document.body.appendChild(stage);
 
-  return root;
+  return shadowRoot;
 }
 
 export function injectCSS(
