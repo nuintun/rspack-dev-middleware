@@ -146,9 +146,9 @@ export function appendDOMString<T extends DOMParserSupportedType>(
   const nodes: ChildNode[] = [];
   const parser = new DOMParser();
   const fragment = document.createDocumentFragment();
-  const { body } = parser.parseFromString(string.trim(), type);
+  const { body, childNodes } = parser.parseFromString(string.trim(), type);
 
-  for (const node of body.childNodes) {
+  for (const node of body ? body.childNodes : childNodes) {
     nodes.push(node);
     fragment.appendChild(node);
   }
