@@ -1,7 +1,7 @@
 import * as styles from './css/App.module.css';
 
 import { memo, useEffect } from 'react';
-import { selectCropArea } from './cropper';
+import { selectCaptureArea } from './capturer';
 
 import logo from './images/react.svg';
 import github from './videos/github.mp4';
@@ -16,7 +16,7 @@ export default memo(function App() {
 
         event.preventDefault();
 
-        selectCropArea()
+        selectCaptureArea()
           .then(
             rect => {
               console.log(rect);

@@ -12,7 +12,7 @@ interface KeyboardEventHandler {
   (event: KeyboardEvent): void;
 }
 
-const COMPONENT_NAME = 'view-cropper';
+const COMPONENT_NAME = 'view-capturer';
 
 class AbortError extends Error {
   public override readonly name = 'AbortError';
@@ -73,7 +73,7 @@ const CSS = `
 }
 `;
 
-export function selectCropArea(): Promise<DOMRect> {
+export function selectCaptureArea(): Promise<DOMRect> {
   if (promise === null) {
     promise = new Promise<DOMRect>((resolve, reject) => {
       let startX = 0;
