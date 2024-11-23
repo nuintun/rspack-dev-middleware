@@ -12,7 +12,7 @@ interface KeyboardEventHandler {
   (event: KeyboardEvent): void;
 }
 
-const COMPONENT_NAME = 'v-capturer';
+const COMPONENT_NAME = 'view-capturer';
 
 class AbortError extends Error {
   public override readonly name = 'AbortError';
