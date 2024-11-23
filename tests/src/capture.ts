@@ -12,32 +12,7 @@ interface KeyboardEventHandler {
   (event: KeyboardEvent): void;
 }
 
-const styleSheet = `
-@keyframes ants {
-  from {
-    stroke-dashoffset: 0;
-  }
-
-  to {
-    stroke-dashoffset: -10;
-  }
-}
-
-.selection {
-  animation: ants 0.5s linear infinite;
-}
-
-.screenshot {
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  position: fixed;
-  z-index: 2147483647;
-  cursor: url(${crosshair}) 16 16, crosshair;
-}
-`;
+const componentName = 'svg-screenshot';
 
 class AbortError extends Error {
   public override readonly name = 'AbortError';
@@ -49,6 +24,50 @@ class AbortError extends Error {
 
 let promise: Promise<DOMRectReadOnly> | null = null;
 
+const styleSheet = `
+.${componentName},
+.${componentName}-marching-ants {
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: url(${crosshair}) 16 16, crosshair;
+}
+
+.${componentName} {
+  position: fixed;
+  z-index: 2147483646;
+}
+
+@keyframes marching-ants {
+  0% {
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+  }
+
+  100% {
+    background-position: 20px 0, -20px 100%, 0 -20px, 100% 20px;
+  }
+}
+
+.${componentName}-marching-ants {
+  width: 0;
+  height: 0;
+  color: #fff;
+  position: absolute;
+  z-index: 2147483647;
+  animation: marching-ants 1s linear infinite;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  background-image:
+    linear-gradient(to right, #fff 50%, #000 50%),
+    linear-gradient(to right, #fff 50%, #000 50%),
+    linear-gradient(to bottom, #fff 50%, #000 50%),
+    linear-gradient(to bottom, #fff 50%, #000 50%);
+  background-size: 10px 1px, 10px 1px, 1px 10px, 1px 10px;
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+}
+`;
+
 export function selectCaptureArea(): Promise<DOMRectReadOnly> {
   if (promise === null) {
     promise = new Promise<DOMRectReadOnly>((resolve, reject) => {
@@ -59,15 +78,18 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       const { documentElement } = document;
       const style = document.createElement('style');
       const namespace = 'http://www.w3.org/2000/svg';
-      const stage = document.createElement('svg-screenshot');
+      const stage = document.createElement(componentName);
+      const defs = document.createElementNS(namespace, 'defs');
       const shadowRoot = stage.attachShadow({ mode: 'closed' });
       const screenshot = document.createElementNS(namespace, 'svg');
 
-      screenshot.classList.add('screenshot');
+      screenshot.classList.add(componentName);
+
+      screenshot.setAttribute('xmlns', namespace);
 
       const mask = document.createElementNS(namespace, 'mask');
 
-      mask.id = 'selection-mask';
+      mask.id = `${componentName}-selection`;
 
       const background = document.createElementNS(namespace, 'rect');
 
@@ -77,24 +99,22 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
       const selection = document.createElementNS(namespace, 'rect');
 
-      selection.classList.add('selection');
-
       selection.setAttribute('x', '0');
       selection.setAttribute('y', '0');
       selection.setAttribute('width', '0');
       selection.setAttribute('height', '0');
       selection.setAttribute('fill', '#000');
-      selection.setAttribute('stroke', '#fff');
-      selection.setAttribute('stroke-width', '2');
-      selection.setAttribute('stroke-dashoffset', '0');
-      selection.setAttribute('stroke-dasharray', '6, 4');
 
       const backdrop = document.createElementNS(namespace, 'rect');
 
       backdrop.setAttribute('x', '0');
       backdrop.setAttribute('y', '0');
-      backdrop.setAttribute('fill', 'rgba(0, 0, 0, 0.5)');
-      backdrop.setAttribute('mask', 'url(#selection-mask)');
+      backdrop.setAttribute('fill', 'rgba(0, 0, 0, 0.45)');
+      backdrop.setAttribute('mask', `url(#${componentName}-selection)`);
+
+      const ants = document.createElement('div');
+
+      ants.classList.add(`${componentName}-marching-ants`);
 
       const observer = new ResizeObserver(entries => {
         for (const { target } of entries) {
@@ -153,11 +173,20 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
           const { clientWidth, clientHeight } = documentElement;
           const clientX = Math.max(0, Math.min(clientWidth, event.clientX));
           const clientY = Math.max(0, Math.min(clientHeight, event.clientY));
+          const x = Math.min(startX, clientX).toString();
+          const y = Math.min(startY, clientY).toString();
+          const width = Math.abs(clientX - startX).toString();
+          const height = Math.abs(clientY - startY).toString();
 
-          selection.setAttribute('x', Math.min(startX, clientX).toString());
-          selection.setAttribute('y', Math.min(startY, clientY).toString());
-          selection.setAttribute('width', Math.abs(clientX - startX).toString());
-          selection.setAttribute('height', Math.abs(clientY - startY).toString());
+          ants.style.top = `${y}px`;
+          ants.style.left = `${x}px`;
+          ants.style.width = `${width}px`;
+          ants.style.height = `${height}px`;
+
+          selection.setAttribute('x', x);
+          selection.setAttribute('y', y);
+          selection.setAttribute('width', width);
+          selection.setAttribute('height', height);
         }
       };
 
@@ -207,9 +236,11 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
 
       mask.append(background, selection);
 
-      screenshot.append(mask, backdrop);
+      defs.append(mask);
 
-      shadowRoot.append(style, screenshot);
+      screenshot.append(defs, backdrop);
+
+      shadowRoot.append(style, screenshot, ants);
 
       document.body.append(stage);
     });
