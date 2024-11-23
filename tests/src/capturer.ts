@@ -72,9 +72,9 @@ const CSS = `
 }
 `;
 
-export function selectCaptureArea(): Promise<DOMRectReadOnly> {
+export function selectCaptureArea(): Promise<DOMRect> {
   if (promise === null) {
-    promise = new Promise<DOMRectReadOnly>((resolve, reject) => {
+    promise = new Promise<DOMRect>((resolve, reject) => {
       let startX = 0;
       let startY = 0;
       let capturing = false;
