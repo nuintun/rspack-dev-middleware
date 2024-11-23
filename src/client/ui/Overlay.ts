@@ -4,7 +4,7 @@
  */
 
 import * as rspack from '@rspack/core';
-import { ansiToHTML, appendDOMString, getRootElement, injectCSS } from './utils';
+import { ansiToHTML, appendDOMString, getRootElement, insertCSSString } from './utils';
 
 const OVERLAY = 'rdm-overlay';
 
@@ -183,7 +183,7 @@ export class Overlay {
   constructor(name: string) {
     const root = getRootElement(OVERLAY);
 
-    injectCSS(CSS, root);
+    insertCSSString(CSS, root);
 
     const [dialog] = appendDOMString('text/html', HTML, root);
 

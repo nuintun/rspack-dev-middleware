@@ -124,7 +124,7 @@ export function getRootElement(tagName: string): ShadowRoot {
   return shadowRoot;
 }
 
-export function injectCSS(
+export function insertCSSString(
   css: string,
   root: HTMLElement | ShadowRoot = document.body,
   styleElement: HTMLStyleElement = document.createElement('style')
