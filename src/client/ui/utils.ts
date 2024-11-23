@@ -142,16 +142,18 @@ export function appendDOMString<T extends DOMParserSupportedType>(
   type: T,
   string: string,
   root: RootElement = document.body
-): NodeListOf<T extends 'image/svg+xml' ? SVGElement : HTMLElement> {
+): (T extends 'image/svg+xml' ? SVGElement : HTMLElement)[] {
+  const nodes: ChildNode[] = [];
   const parser = new DOMParser();
   const fragment = document.createDocumentFragment();
   const { childNodes } = parser.parseFromString(string.trim(), type);
 
   for (const node of childNodes) {
+    nodes.push(node);
     fragment.appendChild(node);
   }
 
   root.appendChild(fragment);
 
-  return childNodes as NodeListOf<T extends 'image/svg+xml' ? SVGElement : HTMLElement>;
+  return nodes as (T extends 'image/svg+xml' ? SVGElement : HTMLElement)[];
 }
