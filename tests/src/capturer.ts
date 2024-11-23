@@ -25,7 +25,7 @@ class AbortError extends Error {
 let promise: Promise<DOMRectReadOnly> | null = null;
 
 const CSS = `
-.${COMPONENT_NAME}-mask,
+.${COMPONENT_NAME}-backdrop,
 .${COMPONENT_NAME}-selection {
   top: 0;
   left: 0;
@@ -37,7 +37,7 @@ const CSS = `
   cursor: url(${crosshair}) 16 16, crosshair;
 }
 
-.${COMPONENT_NAME}-mask {
+.${COMPONENT_NAME}-backdrop {
   width: 100vw;
   height: 100vh;
   z-index: 2147483646;
@@ -82,14 +82,14 @@ export function selectCaptureArea(): Promise<DOMRect> {
 
       const { documentElement } = document;
 
-      const mask = document.createElement('div');
       const style = document.createElement('style');
+      const backdrop = document.createElement('div');
       const selection = document.createElement('div');
       const stage = document.createElement(COMPONENT_NAME);
 
       const shadowRoot = stage.attachShadow({ mode: 'closed' });
 
-      mask.classList.add(`${COMPONENT_NAME}-mask`);
+      backdrop.classList.add(`${COMPONENT_NAME}-backdrop`);
 
       selection.classList.add(`${COMPONENT_NAME}-selection`);
 
@@ -180,7 +180,7 @@ export function selectCaptureArea(): Promise<DOMRect> {
 
       style.append(CSS);
 
-      shadowRoot.append(style, mask, selection);
+      shadowRoot.append(style, backdrop, selection);
 
       document.body.append(stage);
     });
