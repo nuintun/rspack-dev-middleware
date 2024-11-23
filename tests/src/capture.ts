@@ -12,7 +12,7 @@ interface KeyboardEventHandler {
   (event: KeyboardEvent): void;
 }
 
-const componentName = 'svg-screenshot';
+const COMPONENT_NAME = 'svg-screenshot';
 
 class AbortError extends Error {
   public override readonly name = 'AbortError';
@@ -24,9 +24,9 @@ class AbortError extends Error {
 
 let promise: Promise<DOMRectReadOnly> | null = null;
 
-const styleSheet = `
-.${componentName},
-.${componentName}-marching-ants {
+const CSS = `
+.${COMPONENT_NAME},
+.${COMPONENT_NAME}-marching-ants {
   top: 0;
   left: 0;
   margin: 0;
@@ -35,7 +35,7 @@ const styleSheet = `
   cursor: url(${crosshair}) 16 16, crosshair;
 }
 
-.${componentName} {
+.${COMPONENT_NAME} {
   position: fixed;
   z-index: 2147483646;
 }
@@ -50,7 +50,7 @@ const styleSheet = `
   }
 }
 
-.${componentName}-marching-ants {
+.${COMPONENT_NAME}-marching-ants {
   width: 0;
   height: 0;
   color: #fff;
@@ -78,18 +78,18 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       const { documentElement } = document;
       const style = document.createElement('style');
       const namespace = 'http://www.w3.org/2000/svg';
-      const stage = document.createElement(componentName);
+      const stage = document.createElement(COMPONENT_NAME);
       const defs = document.createElementNS(namespace, 'defs');
       const shadowRoot = stage.attachShadow({ mode: 'closed' });
       const screenshot = document.createElementNS(namespace, 'svg');
 
-      screenshot.classList.add(componentName);
+      screenshot.classList.add(COMPONENT_NAME);
 
       screenshot.setAttribute('xmlns', namespace);
 
       const mask = document.createElementNS(namespace, 'mask');
 
-      mask.id = `${componentName}-selection`;
+      mask.id = `${COMPONENT_NAME}-selection`;
 
       const background = document.createElementNS(namespace, 'rect');
 
@@ -110,11 +110,11 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       backdrop.setAttribute('x', '0');
       backdrop.setAttribute('y', '0');
       backdrop.setAttribute('fill', 'rgba(0, 0, 0, 0.45)');
-      backdrop.setAttribute('mask', `url(#${componentName}-selection)`);
+      backdrop.setAttribute('mask', `url(#${COMPONENT_NAME}-selection)`);
 
       const ants = document.createElement('div');
 
-      ants.classList.add(`${componentName}-marching-ants`);
+      ants.classList.add(`${COMPONENT_NAME}-marching-ants`);
 
       const observer = new ResizeObserver(entries => {
         for (const { target } of entries) {
@@ -232,7 +232,7 @@ export function selectCaptureArea(): Promise<DOMRectReadOnly> {
       window.addEventListener('mousemove', mousemove, true);
       window.addEventListener('mouseup', mouseup, true);
 
-      style.append(styleSheet);
+      style.append(CSS);
 
       mask.append(background, selection);
 
