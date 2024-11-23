@@ -1,5 +1,5 @@
 /**
- * @module capture
+ * @module screenshot
  */
 
 import crosshair from './images/crosshair.cur';

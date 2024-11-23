@@ -1,7 +1,7 @@
 import * as styles from './css/App.module.css';
 
 import { memo, useEffect } from 'react';
-import { selectCaptureArea } from './capture';
+import { selectCaptureArea } from './capturer';
 
 import logo from './images/react.svg';
 import github from './videos/github.mp4';
