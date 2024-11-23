@@ -56,6 +56,7 @@ const CSS = `
   color: #fff;
   position: absolute;
   z-index: 2147483647;
+  will-change: background-position;
   animation: marching-ants 1s linear infinite;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
   background-image:

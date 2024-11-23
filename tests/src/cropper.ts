@@ -50,6 +50,7 @@ const CSS = `
   z-index: 2147483647;
   box-shadow: 0 0 0 100vmax;
   color: rgba(0, 0, 0, 0.45);
+  will-change: background-position;
   animation: marching-ants 1s linear infinite;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
   background-image:
