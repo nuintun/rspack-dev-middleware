@@ -1,5 +1,5 @@
 /**
- * @module capturer
+ * @module cropper
  */
 
 import crosshair from './images/crosshair.cur';
@@ -12,7 +12,7 @@ interface KeyboardEventHandler {
   (event: KeyboardEvent): void;
 }
 
-const COMPONENT_NAME = 'view-capturer';
+const COMPONENT_NAME = 'view-cropper';
 
 class AbortError extends Error {
   public override readonly name = 'AbortError';
@@ -72,7 +72,7 @@ const CSS = `
 }
 `;
 
-export function selectCaptureArea(): Promise<DOMRect> {
+export function selectCropArea(): Promise<DOMRect> {
   if (promise === null) {
     promise = new Promise<DOMRect>((resolve, reject) => {
       let startX = 0;
