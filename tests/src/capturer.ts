@@ -49,11 +49,10 @@ const CSS = `
   width: 0;
   height: 0;
   z-index: 2147483647;
-  box-shadow: 0 0 0 100vmax;
-  color: rgba(0, 0, 0, 0.45);
   will-change: background-position;
   animation: marching-ants 1s linear infinite;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45);
   background-image:
     linear-gradient(to right, #fff 50%, #000 50%),
     linear-gradient(to right, #fff 50%, #000 50%),
