@@ -33,6 +33,7 @@ const CSS = `
   padding: 0;
   border: none;
   position: fixed;
+  overflow: hidden;
   box-sizing: border-box;
   cursor: url(${crosshair}) 16 16, crosshair;
 }
