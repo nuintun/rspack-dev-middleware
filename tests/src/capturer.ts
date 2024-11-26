@@ -4,6 +4,10 @@
 
 import crosshair from './images/crosshair.cur';
 
+interface Cleanup {
+  (callback: () => void): void;
+}
+
 interface MouseEventHandler {
   (event: MouseEvent): void;
 }
@@ -97,9 +101,9 @@ export function selectCaptureArea(): Promise<DOMRect> {
         if (!capturing && event.key === 'Escape') {
           event.preventDefault();
 
-          cleanup();
-
-          reject(new AbortError('aborted capture with escape'));
+          cleanup(() => {
+            reject(new AbortError('aborted capture with escape'));
+          });
         }
       };
 
@@ -153,21 +157,40 @@ export function selectCaptureArea(): Promise<DOMRect> {
 
           const rect = selection.getBoundingClientRect();
 
-          cleanup();
-
-          resolve(rect);
+          cleanup(() => {
+            resolve(rect);
+          });
         }
       };
 
-      const cleanup = () => {
-        promise = null;
-        capturing = false;
-
+      const cleanup: Cleanup = callback => {
         window.removeEventListener('keyup', escape, true);
         window.removeEventListener('contextmenu', contextmenu, true);
         window.removeEventListener('mousedown', mousedown, true);
         window.removeEventListener('mousemove', mousemove, true);
         window.removeEventListener('mouseup', mouseup, true);
+
+        const observer = new MutationObserver((mutations, observer) => {
+          for (let mutation of mutations) {
+            if (mutation.type === 'childList') {
+              for (const removedNode of mutation.removedNodes) {
+                if (removedNode === stage) {
+                  promise = null;
+                  capturing = false;
+
+                  observer.disconnect();
+
+                  callback();
+                  break;
+                }
+              }
+            }
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true
+        });
 
         stage.remove();
       };
