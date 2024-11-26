@@ -14,6 +14,8 @@ interface KeyboardEventHandler {
 
 const COMPONENT_NAME = 'view-capturer';
 
+let promise: Promise<DOMRect> | null = null;
+
 class AbortError extends Error {
   public override readonly name = 'AbortError';
 
@@ -21,8 +23,6 @@ class AbortError extends Error {
     super(message);
   }
 }
-
-let promise: Promise<DOMRectReadOnly> | null = null;
 
 const CSS = `
 .${COMPONENT_NAME}-backdrop,
@@ -99,7 +99,7 @@ export function selectCaptureArea(): Promise<DOMRect> {
 
           cleanup();
 
-          reject(new AbortError('aborted with escape'));
+          reject(new AbortError('aborted capture with escape'));
         }
       };
 
