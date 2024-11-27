@@ -38,6 +38,7 @@ const CSS = `
   border: none;
   position: fixed;
   overflow: hidden;
+  z-index: 2147483647;
   box-sizing: border-box;
   cursor: url(${crosshair}) 16 16, crosshair;
 }
@@ -45,14 +46,12 @@ const CSS = `
 .${COMPONENT_NAME}-backdrop {
   right: 0;
   bottom: 0;
-  z-index: 2147483646;
   background: transparent;
 }
 
 .${COMPONENT_NAME}-selection {
   width: 0;
   height: 0;
-  z-index: 2147483647;
   will-change: background-position;
   animation: marching-ants 1s linear infinite;
   background-position: 0 0, 0 100%, 0 0, 100% 0;
@@ -170,29 +169,14 @@ export function selectCaptureArea(): Promise<DOMRect> {
         window.removeEventListener('mousemove', mousemove, true);
         window.removeEventListener('mouseup', mouseup, true);
 
-        const observer = new MutationObserver((mutations, observer) => {
-          for (let mutation of mutations) {
-            if (mutation.type === 'childList') {
-              for (const removedNode of mutation.removedNodes) {
-                if (removedNode === stage) {
-                  promise = null;
-                  capturing = false;
-
-                  observer.disconnect();
-
-                  callback();
-                  break;
-                }
-              }
-            }
-          }
-        });
-
-        observer.observe(document.body, {
-          childList: true
-        });
-
         stage.remove();
+
+        requestAnimationFrame(() => {
+          promise = null;
+          capturing = false;
+
+          callback();
+        });
       };
 
       window.addEventListener('keyup', escape, true);
