@@ -8,7 +8,7 @@ import memfs from 'memfs';
 import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
-import dev from 'rspack-dev-middleware';
+import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');

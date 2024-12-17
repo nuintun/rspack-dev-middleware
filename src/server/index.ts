@@ -19,7 +19,7 @@ export type Options = DevOptions & { hot?: HotOptions | false };
  * @param compiler The rspack compiler instance.
  * @param options Options.
  */
-export default function server(compiler: UnionCompiler, options: Options = {}): Middleware & Expose {
+export function server(compiler: UnionCompiler, options: Options = {}): Middleware & Expose {
   validate(schema, options, {
     name: PLUGIN_NAME,
     baseDataPath: 'options'

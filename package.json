@@ -9,27 +9,14 @@
   ],
   "main": "cjs/server/index.cjs",
   "module": "esm/server/index.js",
-  "types": "types/server/index.d.ts",
   "exports": {
     ".": {
       "import": "./esm/server/index.js",
-      "require": "./cjs/server/index.cjs",
-      "types": "./types/server/index.d.ts"
+      "require": "./cjs/server/index.cjs"
     },
     "./client": {
       "import": "./esm/client/index.js",
-      "require": "./cjs/client/index.cjs",
-      "types": "./types/client/index.d.ts"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./types/server/index.d.ts"
-      ],
-      "client": [
-        "./types/client/index.d.ts"
-      ]
+      "require": "./cjs/client/index.cjs"
     }
   },
   "files": [
@@ -67,10 +54,10 @@
     "test": "cd tests && node rspack.js",
     "build:cjs": "rollup -c tools/rollup.cjs.js",
     "build:esm": "rollup -c tools/rollup.esm.js",
+    "build:fix-types": "node tools/fix-types.js",
     "format": "prettier --write . --ignore-path .prettierignore",
     "build": "npm run clean && npm run build:main && npm run format",
-    "build:main": "npm run build:cjs && npm run build:esm && npm run build:types",
-    "build:types": "tsc --declaration --emitDeclarationOnly --declarationDir types && node tools/fix-types.js"
+    "build:main": "npm run build:cjs && npm run build:esm && npm run build:fix-types"
   },
   "dependencies": {
     "@nuintun/ansi": "^0.1.1",
@@ -79,33 +66,33 @@
     "etag": "^1.8.1",
     "memfs": "^4.15.0",
     "range-parser": "^1.2.1",
-    "schema-utils": "^4.2.0",
+    "schema-utils": "^4.3.0",
     "supports-color": "^9.4.0",
     "tslib": "^2.8.1",
     "uuid": "^11.0.3",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "^6.0.1",
-    "@rollup/plugin-typescript": "^12.1.1",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@rollup/plugin-url": "^8.0.2",
     "@rspack/core": "^1.1.6",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@types/etag": "^1.8.3",
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.10.2",
     "@types/range-parser": "^1.2.7",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "dts-paths": "^1.0.0",
     "koa": "^2.15.3",
     "koa-compress": "^5.1.1",
-    "magic-string": "^0.30.15",
+    "magic-string": "^0.30.17",
     "prettier": "^3.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-refresh": "^0.16.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.28.1",
-    "tsc-alias": "^1.8.10",
     "typescript": "^5.7.2"
   },
   "peerDependencies": {
