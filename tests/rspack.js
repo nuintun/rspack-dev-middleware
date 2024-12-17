@@ -1,6 +1,6 @@
 /**
  * @module rspack
- * @description Rspack config
+ * @description Rspack config.
  */
 
 import Koa from 'koa';
