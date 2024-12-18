@@ -83,7 +83,7 @@
     "@types/range-parser": "^1.2.7",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
-    "dts-paths": "^1.0.0",
+    "dts-paths": "^1.0.1",
     "koa": "^2.15.3",
     "koa-compress": "^5.1.1",
     "magic-string": "^0.30.17",
