@@ -187,4 +187,4 @@ app.listen(port, () => {
 [side-effect-image]: https://img.shields.io/badge/side--effect-true-yellow?style=flat-square
 [bundle-phobia-url]: https://bundlephobia.com/result?p=rspack-dev-middleware
 [license-image]: https://img.shields.io/github/license/nuintun/rspack-dev-middleware?style=flat-square
-[license-url]: https://github.com/nuintun/rspack-dev-middleware/blob/master/LICENSE
+[license-url]: https://github.com/nuintun/rspack-dev-middleware/blob/main/LICENSE
