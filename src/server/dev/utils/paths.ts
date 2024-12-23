@@ -3,7 +3,6 @@
  */
 
 import { URL } from 'node:url';
-import { unixify } from './path';
 import * as rspack from '@rspack/core';
 import { UnionStats } from '/server/interface';
 
@@ -13,16 +12,6 @@ type PathsItem = [
   // Public path.
   publicPath: string
 ];
-
-function normalize(path: string): string {
-  path = unixify(path);
-
-  if (/^\//.test(path)) {
-    return path;
-  }
-
-  return `/${path}`;
-}
 
 function getStats(stats: UnionStats): rspack.Stats[] {
   if ('stats' in stats) {
@@ -45,11 +34,7 @@ function getPublicPath(compilation: rspack.Compilation): string {
   const path = compilation.getPath(publicPath ?? '');
 
   // Get public path without protocol.
-  try {
-    return new URL(path).pathname;
-  } catch {
-    return normalize(path);
-  }
+  return new URL(path, 'https://127.0.0.1').pathname;
 }
 
 function getOutputPath(compilation: rspack.Compilation): string {
