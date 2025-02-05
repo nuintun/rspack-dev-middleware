@@ -47,7 +47,10 @@ const compiler = rspack({
     assetModuleFilename: `[path][name][ext]`
   },
   experiments: {
-    css: true
+    css: true,
+    cache: {
+      type: 'persistent'
+    }
   },
   watchOptions: {
     aggregateTimeout: 256
@@ -120,7 +123,8 @@ const compiler = rspack({
       prefix: '[Rspack]',
       progressChars: '█▒'
     }),
-    new rspack.HtmlRspackPlugin(html)
+    new rspack.HtmlRspackPlugin(html),
+    new rspack.WarnCaseSensitiveModulesPlugin()
   ]
 });
 
