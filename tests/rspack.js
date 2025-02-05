@@ -35,6 +35,7 @@ const html = {
 };
 
 const compiler = rspack({
+  cache: true,
   name: 'React',
   mode: 'development',
   context: path.resolve('src'),
