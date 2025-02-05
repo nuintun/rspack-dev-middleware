@@ -50,7 +50,8 @@ const compiler = rspack({
     css: true,
     cache: {
       type: 'persistent'
-    }
+    },
+    parallelCodeSplitting: true
   },
   watchOptions: {
     aggregateTimeout: 256
