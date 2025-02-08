@@ -509,8 +509,8 @@ packages:
     resolution: {integrity: sha512-YTd+6wGlNlPxSuri7Y6X8tY2dmm12UMH66RpKMhiX6rsk5wXXnYgbUcOt8kiS31/AjfoTOvCsE+w8nZQLQnzHA==}
     engines: {node: '>= 0.4'}
 
-  caniuse-lite@1.0.30001697:
-    resolution: {integrity: sha512-GwNPlWJin8E+d7Gxq96jxM6w0w+VFeyyXRsjU58emtkYqnbwHqXm5uT2uCmO0RQE9htWknOP4xtBlLmM/gWxvQ==}
+  caniuse-lite@1.0.30001698:
+    resolution: {integrity: sha512-xJ3km2oiG/MbNU8G6zIq6XRZ6HtAOVXsbOrP/blGazi52kc5Yy7b6sDA5O+FbROzRrV7BSTllLHuNvmawYUJjw==}
 
   co@4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -1270,7 +1270,7 @@ snapshots:
       '@module-federation/runtime-tools': 0.8.4
       '@rspack/binding': 1.2.2
       '@rspack/lite-tapable': 1.0.1
-      caniuse-lite: 1.0.30001697
+      caniuse-lite: 1.0.30001698
 
   '@rspack/lite-tapable@1.0.1': {}
 
@@ -1443,7 +1443,7 @@ snapshots:
       call-bind-apply-helpers: 1.0.1
       get-intrinsic: 1.2.7
 
-  caniuse-lite@1.0.30001697: {}
+  caniuse-lite@1.0.30001698: {}
 
   co@4.6.0: {}
 
