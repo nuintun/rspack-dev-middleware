@@ -49,14 +49,14 @@ const compiler = rspack({
   },
   experiments: {
     css: true,
+    parallelCodeSplitting: true,
     cache: {
       type: 'persistent',
       storage: {
         type: 'filesystem',
         directory: path.resolve('../node_modules/.cache/rspack')
       }
-    },
-    parallelCodeSplitting: true
+    }
   },
   watchOptions: {
     aggregateTimeout: 256
@@ -71,7 +71,6 @@ const compiler = rspack({
   },
   devtool: 'eval-cheap-module-source-map',
   resolve: {
-    fallback: { url: false },
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   module: {
