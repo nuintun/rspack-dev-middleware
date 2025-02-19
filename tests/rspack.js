@@ -47,36 +47,6 @@ const compiler = rspack({
     path: path.resolve('wwwroot/public'),
     assetModuleFilename: `[path][name][ext]`
   },
-  experiments: {
-    css: true,
-    parallelCodeSplitting: true,
-    cache: {
-      type: 'persistent',
-      storage: {
-        type: 'filesystem',
-        directory: path.resolve('../node_modules/.cache/rspack')
-      }
-    }
-  },
-  watchOptions: {
-    aggregateTimeout: 256
-  },
-  stats: {
-    all: false,
-    assets: true,
-    colors: true,
-    errors: true,
-    timings: true,
-    version: true,
-    warnings: true,
-    errorsCount: true,
-    warningsCount: true,
-    groupAssetsByPath: true
-  },
-  devtool: 'eval-cheap-module-source-map',
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
-  },
   module: {
     parser: {
       'css/auto': {
@@ -126,6 +96,9 @@ const compiler = rspack({
       }
     ]
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  },
   plugins: [
     new ReactRefreshPlugin(),
     new rspack.ProgressPlugin({
@@ -134,7 +107,35 @@ const compiler = rspack({
     }),
     new rspack.HtmlRspackPlugin(html),
     new rspack.WarnCaseSensitiveModulesPlugin()
-  ]
+  ],
+  watchOptions: {
+    aggregateTimeout: 256
+  },
+  stats: {
+    all: false,
+    assets: true,
+    colors: true,
+    errors: true,
+    timings: true,
+    version: true,
+    warnings: true,
+    errorsCount: true,
+    warningsCount: true,
+    groupAssetsByPath: true
+  },
+  devtool: 'eval-cheap-module-source-map',
+  experiments: {
+    css: true,
+    incremental: true,
+    parallelCodeSplitting: true,
+    cache: {
+      type: 'persistent',
+      storage: {
+        type: 'filesystem',
+        directory: path.resolve('../node_modules/.cache/rspack')
+      }
+    }
+  }
 });
 
 const port = 8000;
