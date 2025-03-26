@@ -79,7 +79,7 @@
     "@rspack/core": "^1.2.8",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@types/etag": "^1.8.3",
-    "@types/node": "^22.13.11",
+    "@types/node": "^22.13.13",
     "@types/range-parser": "^1.2.7",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
