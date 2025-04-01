@@ -126,7 +126,6 @@ const compiler = rspack({
   devtool: 'eval-cheap-module-source-map',
   experiments: {
     css: true,
-    parallelCodeSplitting: true,
     cache: {
       type: 'persistent',
       storage: {
