@@ -48,7 +48,7 @@ const SVG = `
 <svg xmlns="http://www.w3.org/2000/svg" class="${PROGRESS}" x="0" y="0" viewBox="0 0 96 96">
   <circle fill="#23272f" cx="50%" cy="50%" r="44" />
   <circle class="${PROGRESS}-track" cx="50%" cy="50%" r="44" />
-  <image href="${logo}" x="16" y="22.053" width="64" height="49.894"/>
+  <image href="${logo}" x="16" y="23.0528" width="64" height="49.8944"/>
 </svg>
 `;
 
