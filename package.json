@@ -1,6 +1,6 @@
 {
   "name": "rspack-dev-middleware",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "A koa 2 middleware for rspack development and hot reloading.",
   "type": "module",
   "sideEffects": [
