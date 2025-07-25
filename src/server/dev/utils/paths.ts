@@ -23,7 +23,7 @@ function getStats(stats: UnionStats): rspack.Stats[] {
 }
 
 function getPublicPath(compilation: rspack.Compilation): string {
-  const { publicPath } = compilation.outputOptions;
+  const { publicPath = '' } = compilation.outputOptions;
 
   // @see https://webpack.js.org/guides/public-path/#automatic-publicpath
   if (publicPath === 'auto') {
@@ -31,7 +31,7 @@ function getPublicPath(compilation: rspack.Compilation): string {
   }
 
   // Get public path.
-  const path = compilation.getPath(publicPath ?? '');
+  const path = compilation.getPath(publicPath as string);
 
   // Get public path without protocol.
   return new URL(path, 'https://127.0.0.1').pathname;
