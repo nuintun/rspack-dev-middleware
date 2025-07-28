@@ -66,7 +66,7 @@
     "@types/koa": "^2.15.0",
     "@types/ws": "^8.18.1",
     "etag": "^1.8.1",
-    "memfs": "^4.17.2",
+    "memfs": "^4.23.0",
     "range-parser": "^1.2.1",
     "schema-utils": "^4.3.2",
     "supports-color": "^10.0.0",
@@ -86,7 +86,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "dts-paths": "^1.1.10",
-    "koa": "^3.0.0",
+    "koa": "^3.0.1",
     "koa-compress": "^5.1.1",
     "magic-string": "^0.30.17",
     "prettier": "^3.6.2",
@@ -94,7 +94,7 @@
     "react-dom": "^19.1.0",
     "react-refresh": "^0.17.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.45.1",
+    "rollup": "^4.46.1",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
