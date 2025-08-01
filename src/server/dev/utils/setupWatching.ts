@@ -32,7 +32,6 @@ function getWatching({ compiler, logger }: InitialContext): UnionWatching {
     return options.watchOptions;
   });
 
-  // @ts-expect-error
   return compiler.watch(watchOptions, errorHandler);
 }
 
