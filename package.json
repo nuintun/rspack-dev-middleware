@@ -94,7 +94,7 @@
     "react-dom": "^19.1.1",
     "react-refresh": "^0.17.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.46.3",
+    "rollup": "^4.46.4",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
