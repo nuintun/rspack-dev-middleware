@@ -1,6 +1,6 @@
 {
   "name": "rspack-dev-middleware",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "description": "A koa 2 middleware for rspack development and hot reloading.",
   "type": "module",
   "sideEffects": [
@@ -66,7 +66,7 @@
     "@types/koa": "^3.0.0",
     "@types/ws": "^8.18.1",
     "etag": "^1.8.1",
-    "memfs": "^4.38.3",
+    "memfs": "^4.39.0",
     "range-parser": "^1.2.1",
     "schema-utils": "^4.3.2",
     "supports-color": "^10.2.2",
@@ -81,9 +81,9 @@
     "@rspack/core": "^1.5.3",
     "@rspack/plugin-react-refresh": "^1.5.1",
     "@types/etag": "^1.8.4",
-    "@types/node": "^24.3.1",
+    "@types/node": "^24.4.0",
     "@types/range-parser": "^1.2.7",
-    "@types/react": "^19.1.12",
+    "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "dts-paths": "^1.1.12",
     "koa": "^3.0.1",
@@ -93,7 +93,7 @@
     "react-dom": "^19.1.1",
     "react-refresh": "^0.17.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.50.1",
+    "rollup": "^4.50.2",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
