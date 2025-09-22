@@ -4,20 +4,19 @@
  */
 
 import Koa from 'koa';
-import memfs from 'memfs';
 import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
+import { Volume, createFsFromVolume } from 'memfs';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');
 
 function createMemfs() {
-  const volume = new memfs.Volume();
-  const fs = memfs.createFsFromVolume(volume);
+  const volume = new Volume();
 
-  return fs;
+  return createFsFromVolume(volume);
 }
 
 function httpError(error) {
