@@ -3,9 +3,9 @@
  */
 
 // Last error.
-let error: Error;
+let lastError: Error;
 // Last update hash.
-let hash = __webpack_hash__;
+let lastHash = __webpack_hash__;
 
 // Webpack hot.
 const webpackHot = import.meta.webpackHot;
@@ -16,10 +16,10 @@ let status: HotUpdateStatus = webpackHot?.status() ?? 'idle';
 /**
  * @function updateHash
  * @description Update webpack hash.
- * @param value The new hash value.
+ * @param hash The new hash value.
  */
-export function updateHash(value: string): void {
-  hash = value;
+export function updateHash(hash: string): void {
+  lastHash = hash;
 }
 
 /**
@@ -30,7 +30,7 @@ export function updateHash(value: string): void {
  */
 export function applyUpdate(hmr: boolean, fallback: (error?: Error) => void): void {
   // Update available.
-  if (hash !== __webpack_hash__) {
+  if (lastHash !== __webpack_hash__) {
     // HMR enabled.
     if (hmr && webpackHot != null) {
       switch (status) {
@@ -45,7 +45,7 @@ export function applyUpdate(hmr: boolean, fallback: (error?: Error) => void): vo
               // Update status.
               status = webpackHot.status();
             })
-            .catch((exception: Error) => {
+            .catch((error: Error) => {
               // Get status.
               const currentStatus = webpackHot.status();
 
@@ -61,16 +61,16 @@ export function applyUpdate(hmr: boolean, fallback: (error?: Error) => void): vo
               }
 
               // Cache error.
-              error = exception;
+              lastError = error;
 
               // Call fallback.
-              fallback(error);
+              fallback(lastError);
             });
           break;
         case 'fail':
         case 'abort':
           // Call fallback.
-          fallback(error);
+          fallback(lastError);
           break;
       }
     } else {
