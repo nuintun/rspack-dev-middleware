@@ -138,7 +138,7 @@ const compiler = rspack({
 const port = 8000;
 const app = new Koa();
 const fs = createMemfs();
-const server = dev(compiler, {
+const server = await dev(compiler, {
   fs,
   headers: {
     'Cache-Control': 'no-cache',
@@ -164,7 +164,5 @@ app.on('error', error => {
 });
 
 app.listen(port, () => {
-  server.ready(() => {
-    server.logger.info(`server run at: \x1b[36mhttp://127.0.0.1:${port}\x1b[0m`);
-  });
+  server.logger.info(`server run at: \x1b[36mhttp://127.0.0.1:${port}\x1b[0m`);
 });

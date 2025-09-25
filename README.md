@@ -19,20 +19,19 @@
  */
 
 import Koa from 'koa';
-import memfs from 'memfs';
 import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
+import { Volume, createFsFromVolume } from 'memfs';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
 const entryHTML = path.resolve('wwwroot/index.html');
 
 function createMemfs() {
-  const volume = new memfs.Volume();
-  const fs = memfs.createFsFromVolume(volume);
+  const volume = new Volume();
 
-  return fs;
+  return createFsFromVolume(volume);
 }
 
 function httpError(error) {
@@ -50,6 +49,7 @@ const html = {
 };
 
 const compiler = rspack({
+  cache: true,
   name: 'React',
   mode: 'development',
   context: path.resolve('src'),
@@ -60,25 +60,6 @@ const compiler = rspack({
     chunkFilename: `js/[name].js`,
     path: path.resolve('wwwroot/public'),
     assetModuleFilename: `[path][name][ext]`
-  },
-  experiments: {
-    css: true
-  },
-  watchOptions: {
-    aggregateTimeout: 256
-  },
-  stats: {
-    colors: true,
-    chunks: false,
-    children: false,
-    entrypoints: false,
-    runtimeModules: false,
-    dependentModules: false
-  },
-  devtool: 'eval-cheap-module-source-map',
-  resolve: {
-    fallback: { url: false },
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   module: {
     parser: {
@@ -129,20 +110,50 @@ const compiler = rspack({
       }
     ]
   },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  },
   plugins: [
     new ReactRefreshPlugin(),
     new rspack.ProgressPlugin({
       prefix: '[Rspack]',
       progressChars: '█▒'
     }),
-    new rspack.HtmlRspackPlugin(html)
-  ]
+    new rspack.HtmlRspackPlugin(html),
+    new rspack.WarnCaseSensitiveModulesPlugin()
+  ],
+  watchOptions: {
+    aggregateTimeout: 256
+  },
+  stats: {
+    all: false,
+    assets: true,
+    colors: true,
+    errors: true,
+    timings: true,
+    version: true,
+    warnings: true,
+    errorsCount: true,
+    warningsCount: true,
+    groupAssetsByPath: true
+  },
+  devtool: 'eval-cheap-module-source-map',
+  experiments: {
+    css: true,
+    cache: {
+      type: 'persistent',
+      storage: {
+        type: 'filesystem',
+        directory: path.resolve('../node_modules/.cache/rspack')
+      }
+    }
+  }
 });
 
 const port = 8000;
 const app = new Koa();
 const fs = createMemfs();
-const server = dev(compiler, {
+const server = await dev(compiler, {
   fs,
   headers: {
     'Cache-Control': 'no-cache',
@@ -168,9 +179,7 @@ app.on('error', error => {
 });
 
 app.listen(port, () => {
-  server.ready(() => {
-    server.logger.info(`server run at: \u001B[36mhttp://127.0.0.1:${port}\u001B[0m`);
-  });
+  server.logger.info(`server run at: \x1b[36mhttp://127.0.0.1:${port}\x1b[0m`);
 });
 ```
 
