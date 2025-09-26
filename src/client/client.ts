@@ -5,9 +5,9 @@
 import { emit } from './events';
 import * as rspack from '@rspack/core';
 import { Overlay } from './ui/Overlay';
-import { Fallback, HotUpdate } from './HotUpdate';
 import { Progress } from './ui/Progress';
 import { GetProp } from '/server/interface';
+import { Fallback, HotUpdate } from './HotUpdate';
 import { Message, Messages } from '/server/hot/Message';
 
 export interface Options {
