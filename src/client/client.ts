@@ -5,7 +5,7 @@
 import { emit } from './events';
 import * as rspack from '@rspack/core';
 import { Overlay } from './ui/Overlay';
-import { HotUpdate } from './HotUpdate';
+import { Fallback, HotUpdate } from './HotUpdate';
 import { Progress } from './ui/Progress';
 import { GetProp } from '/server/interface';
 import { Message, Messages } from '/server/hot/Message';
@@ -27,13 +27,17 @@ export function createClient(options: Options): void {
   const progress = new Progress();
   const overlay = new Overlay(options.name);
 
-  const fallback = (): void => {
-    queueMicrotask(() => {
-      if (options.reload) {
-        self.location.reload();
-      } else {
-        console.warn('[HMR] Hot update failed. Please reload the page manually.');
-      }
+  const fallback: Fallback = () => {
+    return new Promise(resolve => {
+      queueMicrotask(() => {
+        if (options.reload) {
+          self.location.reload();
+        } else {
+          console.warn('[HMR] Hot update failed. Please reload the page manually.');
+        }
+
+        resolve();
+      });
     });
   };
 
