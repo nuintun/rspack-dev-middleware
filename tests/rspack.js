@@ -7,7 +7,7 @@ import Koa from 'koa';
 import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
-import { Volume, createFsFromVolume } from 'memfs';
+import { createFsFromVolume, Volume } from 'memfs';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
@@ -19,9 +19,15 @@ function createMemfs() {
   return createFsFromVolume(volume);
 }
 
-function httpError(error) {
-  return /^(EOF|EPIPE|ECANCELED|ECONNRESET|ECONNABORTED)$/i.test(error.code);
-}
+// HTTP client error codes.
+const HTTP_CLIENT_ERROR_CODES = new Set([
+  'EOF', // End of file - client closed connection.
+  'EPIPE', // Broken pipe - client disconnected.
+  'ECANCELED', // Operation canceled.
+  'ECONNRESET', // Connection reset by peer.
+  'ECONNABORTED', // Connection aborted.
+  'ERR_STREAM_PREMATURE_CLOSE' // Stream closed before finishing.
+]);
 
 const html = {
   minify: true,
@@ -160,7 +166,9 @@ app.use(async ctx => {
 });
 
 app.on('error', error => {
-  !httpError(error) && console.error(error);
+  if (!HTTP_CLIENT_ERROR_CODES.has(error.code)) {
+    console.error(error);
+  }
 });
 
 app.listen(port, () => {
