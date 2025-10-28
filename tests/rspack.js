@@ -11,14 +11,6 @@ import { createFsFromVolume, Volume } from 'memfs';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
-const entryHTML = path.resolve('wwwroot/index.html');
-
-function createMemfs() {
-  const volume = new Volume();
-
-  return createFsFromVolume(volume);
-}
-
 // HTTP client error codes.
 const HTTP_CLIENT_ERROR_CODES = new Set([
   'EOF', // End of file - client closed connection.
@@ -28,6 +20,14 @@ const HTTP_CLIENT_ERROR_CODES = new Set([
   'ECONNABORTED', // Connection aborted.
   'ERR_STREAM_PREMATURE_CLOSE' // Stream closed before finishing.
 ]);
+
+const entryHTML = path.resolve('wwwroot/index.html');
+
+function createMemfs() {
+  const volume = new Volume();
+
+  return createFsFromVolume(volume);
+}
 
 const html = {
   minify: true,
