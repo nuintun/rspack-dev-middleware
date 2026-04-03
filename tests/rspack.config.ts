@@ -1,6 +1,5 @@
 /**
- * @module rspack
- * @description Rspack config.
+ * @module rspack.config
  */
 
 import Koa from 'koa';
@@ -8,8 +7,13 @@ import path from 'node:path';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
 import { createFsFromVolume, Volume } from 'memfs';
+import type { Options } from 'rspack-dev-middleware';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+
+type FileSystem = NonNullable<Options['fs']> & {
+  createReadStream(path: string): NodeJS.ReadStream;
+};
 
 // HTTP client error codes.
 const HTTP_CLIENT_ERROR_CODES = new Set([
@@ -26,7 +30,7 @@ const entryHTML = path.resolve('wwwroot/index.html');
 function createMemfs() {
   const volume = new Volume();
 
-  return createFsFromVolume(volume);
+  return createFsFromVolume(volume) as unknown as FileSystem;
 }
 
 const html = {
@@ -111,7 +115,7 @@ const compiler = rspack({
       progressChars: '█▒'
     }),
     new rspack.HtmlRspackPlugin(html),
-    new rspack.WarnCaseSensitiveModulesPlugin()
+    new rspack.CaseSensitivePlugin()
   ],
   watchOptions: {
     aggregateTimeout: 256
