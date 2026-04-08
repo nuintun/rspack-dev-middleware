@@ -2,16 +2,28 @@
  * @module fs
  */
 
-import fs, { Stats } from 'node:fs';
+import { Stats } from 'node:fs';
+import { Buffer } from 'node:buffer';
 import * as rspack from '@rspack/core';
 import { GetProp } from '/server/interface';
 import { createFsFromVolume, Volume } from 'memfs';
 
+interface Callback<T extends unknown[] = []> {
+  (error: Error | null, ...rest: T): void;
+}
+
 export interface FileSystem extends GetProp<rspack.Compiler, 'outputFileSystem'> {
-  stat: typeof fs.stat;
-  open: typeof fs.open;
-  read: typeof fs.read;
-  close: typeof fs.close;
+  close(fd: number, callback: Callback): void;
+  read<T extends Buffer<ArrayBuffer>>(
+    fd: number,
+    buffer: T,
+    offset: number,
+    length: number,
+    position: number,
+    callback: Callback<[bytesRead: number, buffer: T]>
+  ): void;
+  stat(path: string, callback: Callback<[stats: Stats]>): void;
+  open(path: string, flags: string, callback: Callback<[fd: number]>): void;
 }
 
 /**
@@ -21,7 +33,7 @@ export interface FileSystem extends GetProp<rspack.Compiler, 'outputFileSystem'>
 export function createMemfs(): FileSystem {
   const volume = new Volume();
 
-  return createFsFromVolume(volume) as unknown as FileSystem;
+  return createFsFromVolume(volume) as FileSystem;
 }
 
 /**
