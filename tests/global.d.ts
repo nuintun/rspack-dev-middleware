@@ -36,9 +36,3 @@ declare module '*.mp4' {
 
   export = content;
 }
-
-declare module 'rspack-dev-middleware/client' {
-  const { on, off } = await import('../esm/client');
-
-  export = { on, off };
-}
