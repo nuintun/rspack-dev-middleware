@@ -1,14 +1,12 @@
 {
   "name": "rspack-dev-middleware",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "A koa 2 middleware for rspack development and hot reloading.",
   "type": "module",
   "sideEffects": [
     "esm/client/main.js",
     "cjs/client/main.cjs"
   ],
-  "main": "cjs/server/index.cjs",
-  "module": "esm/server/index.js",
   "exports": {
     ".": {
       "import": "./esm/server/index.js",
