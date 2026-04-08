@@ -2,28 +2,29 @@
  * @module fs
  */
 
-import { Stats } from 'node:fs';
-import { Buffer } from 'node:buffer';
 import * as rspack from '@rspack/core';
-import { GetProp } from '/server/interface';
+import { PathLike, Stats } from 'node:fs';
 import { createFsFromVolume, Volume } from 'memfs';
 
+type Position = number | bigint | null;
+
+type OpenMode = string | number | undefined;
+
 interface Callback<T extends unknown[] = []> {
-  (error: Error | null, ...rest: T): void;
+  (error?: Error | null, ...rest: T): void;
 }
 
-export interface FileSystem extends GetProp<rspack.Compiler, 'outputFileSystem'> {
-  close(fd: number, callback: Callback): void;
-  read<T extends Buffer<ArrayBuffer>>(
+export interface FileSystem extends rspack.OutputFileSystem {
+  close(fd: number, callback?: Callback): void;
+  read<T extends ArrayBufferView>(
     fd: number,
     buffer: T,
     offset: number,
     length: number,
-    position: number,
+    position: Position,
     callback: Callback<[bytesRead: number, buffer: T]>
   ): void;
-  stat(path: string, callback: Callback<[stats: Stats]>): void;
-  open(path: string, flags: string, callback: Callback<[fd: number]>): void;
+  open(path: PathLike, flags: OpenMode, callback: Callback<[fd: number]>): void;
 }
 
 /**
@@ -45,7 +46,7 @@ export function createMemfs(): FileSystem {
 export function stat(fs: FileSystem, path: string): Promise<Stats | null> {
   return new Promise(resolve => {
     fs.stat(path, (error, stats) => {
-      resolve(error != null ? null : stats);
+      resolve(error != null ? null : (stats ?? null));
     });
   });
 }

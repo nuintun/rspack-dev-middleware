@@ -4,6 +4,7 @@
 
 import Koa from 'koa';
 import path from 'node:path';
+import type { IFs } from 'memfs';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
 import { createFsFromVolume, Volume } from 'memfs';
@@ -11,8 +12,8 @@ import type { Options } from 'rspack-dev-middleware';
 import { server as dev } from 'rspack-dev-middleware';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 
-type FileSystem = NonNullable<Options['fs']> & {
-  createReadStream(path: string): NodeJS.ReadStream;
+type FileSystem = Options['fs'] & {
+  createReadStream: IFs['createReadStream'];
 };
 
 // HTTP client error codes.
@@ -30,7 +31,7 @@ const entryHTML = path.resolve('wwwroot/index.html');
 function createMemfs() {
   const volume = new Volume();
 
-  return createFsFromVolume(volume) as unknown as FileSystem;
+  return createFsFromVolume(volume) as FileSystem;
 }
 
 const html = {
