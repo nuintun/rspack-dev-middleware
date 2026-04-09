@@ -2,7 +2,6 @@
  * @module paths
  */
 
-import { URL } from 'node:url';
 import * as rspack from '@rspack/core';
 import { UnionStats } from '/server/interface';
 

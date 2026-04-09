@@ -3,7 +3,6 @@
  */
 
 import { Context } from 'koa';
-import { URL } from 'node:url';
 import * as rspack from '@rspack/core';
 import { isBoolean, isString } from '/server/utils';
 import { NormalizedOptions, Options } from './interface';
