@@ -10,7 +10,7 @@ import compress from 'koa-compress';
 import { createFsFromVolume, Volume } from 'memfs';
 import type { Options } from 'rspack-dev-middleware';
 import { server as dev } from 'rspack-dev-middleware';
-import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
 type FileSystem = Options['fs'] & {
   createReadStream: IFs['createReadStream'];
@@ -110,13 +110,13 @@ const compiler = rspack({
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   plugins: [
-    new ReactRefreshPlugin(),
     new rspack.ProgressPlugin({
       prefix: '[Rspack]',
       progressChars: '█▒'
     }),
     new rspack.HtmlRspackPlugin(html),
-    new rspack.CaseSensitivePlugin()
+    new rspack.CaseSensitivePlugin(),
+    new ReactRefreshRspackPlugin()
   ],
   watchOptions: {
     aggregateTimeout: 256
