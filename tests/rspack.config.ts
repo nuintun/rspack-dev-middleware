@@ -3,14 +3,16 @@
  */
 
 import Koa from 'koa';
-import path from 'node:path';
 import type { IFs } from 'memfs';
 import rspack from '@rspack/core';
 import compress from 'koa-compress';
+import { resolve } from 'node:path';
 import { createFsFromVolume, Volume } from 'memfs';
 import type { Options } from 'rspack-dev-middleware';
 import { server as dev } from 'rspack-dev-middleware';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
+
+const context = resolve('src');
 
 type FileSystem = Options['fs'] & {
   createReadStream: IFs['createReadStream'];
@@ -26,7 +28,7 @@ const HTTP_CLIENT_ERROR_CODES = new Set([
   'ERR_STREAM_PREMATURE_CLOSE' // Stream closed before finishing.
 ]);
 
-const entryHTML = path.resolve('wwwroot/index.html');
+const entryHTML = resolve('wwwroot/index.html');
 
 function createMemfs() {
   const volume = new Volume();
@@ -38,24 +40,26 @@ const html = {
   minify: true,
   title: 'Rspack',
   filename: entryHTML,
+  template: resolve('index.ejs'),
   templateParameters: { lang: 'en' },
-  template: path.resolve('index.ejs'),
-  favicon: path.resolve('src/images/favicon.png'),
+  favicon: resolve('src/images/favicon.png'),
   meta: { 'theme-color': '#4285f4', viewport: 'width=device-width,initial-scale=1.0' }
 };
 
 const compiler = rspack({
-  cache: true,
+  context,
   name: 'React',
   mode: 'development',
-  context: path.resolve('src'),
-  entry: path.resolve('src/index.tsx'),
+  entry: resolve('src/index.tsx'),
   output: {
     publicPath: '/public/',
     filename: `js/[name].js`,
     chunkFilename: `js/[name].js`,
-    path: path.resolve('wwwroot/public'),
+    path: resolve('wwwroot/public'),
     assetModuleFilename: `[path][name][ext]`
+  },
+  experiments: {
+    css: true
   },
   module: {
     parser: {
@@ -107,6 +111,7 @@ const compiler = rspack({
     ]
   },
   resolve: {
+    roots: [context],
     extensions: ['.ts', '.tsx', '.js', '.jsx']
   },
   plugins: [
@@ -134,14 +139,11 @@ const compiler = rspack({
     groupAssetsByPath: true
   },
   devtool: 'eval-cheap-module-source-map',
-  experiments: {
-    css: true,
-    cache: {
-      type: 'persistent',
-      storage: {
-        type: 'filesystem',
-        directory: path.resolve('../node_modules/.cache/rspack')
-      }
+  cache: {
+    type: 'persistent',
+    storage: {
+      type: 'filesystem',
+      directory: resolve('../node_modules/.cache/rspack')
     }
   }
 });

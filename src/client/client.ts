@@ -50,9 +50,9 @@ export function createClient(options: Options): void {
     }
   };
 
-  const onProgress = ({ percentage }: GetProp<Messages, 'progress'>): void => {
+  const onProgress = ({ percent }: GetProp<Messages, 'progress'>): void => {
     if (options.progress) {
-      progress.update(percentage);
+      progress.update(percent);
     }
   };
 
