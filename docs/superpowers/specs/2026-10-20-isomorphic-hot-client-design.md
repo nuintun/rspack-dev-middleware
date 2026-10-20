@@ -88,12 +88,8 @@ if (hasDOM) {
   // 浏览器（现状路径，行为不变）
   startWSClient(getWSOptions(), createDOMAdapter());
 } else if (isNode) {
-  // SSR 服务端：webpackIgnore 阻止 web 构建解析 node:*
-  Promise.all([
-    import(/* webpackIgnore: true */ 'node:fs'),
-    import(/* webpackIgnore: true */ 'node:os'),
-    import(/* webpackIgnore: true */ 'node:path')
-  ]).then(([fs, os, path]) => startFileClient(getCommonOptions(), { fs, os, path }));
+  // SSR 服务端：通道文件绝对路径由服务端经注入参数下发，仅需 node:fs
+  import(/* webpackIgnore: true */ 'node:fs').then(fs => startFileClient(getCommonOptions(), fs));
 } else {
   // webworker：完整 HMR + console 输出
   startWSClient(getWSOptions(), createConsoleAdapter());
@@ -102,7 +98,7 @@ if (hasDOM) {
 
 要点：
 
-- `node:fs/os/path` 仅可通过**原生动态 import + `/* webpackIgnore: true */` 魔法注释**引用（rspack 支持）。同一份源码在 web target 构建不会触发模块解析错误，node target 运行时原生加载
+- 客户端**仅动态引入 `node:fs`**（watch + readFile，即传输本身），通过 `/* webpackIgnore: true */` 魔法注释引用（rspack 支持）。同一份源码在 web target 构建不会触发模块解析错误，node target 运行时原生加载。通道文件路径由服务端计算并经注入参数下发（见 6.1），客户端不做任何路径计算，**不依赖 `node:os`/`node:path`**
 - 禁止顶层 await（兼容 cjs 产物），node 分支使用异步 IIFE/Promise 链
 - **选项解析拆分**：`getCommonOptions()`（uuid/name/hmr/reload/overlay/progress/path）两端共享；`origin/wss` 属 WS 专属，仅在 `getWSOptions()` 中解析（现 `main.ts` 的 `getOrigin` 依赖 `document`/`self.location`，node 下会 ReferenceError，必须移入 WS 分支；worker 分支的 `getCurrentScript` 需 `typeof document` 守卫）
 - `__resourceQuery` 为编译期注入常量，node target 同样可用
@@ -114,6 +110,7 @@ if (hasDOM) {
 
 - 文件名：`os.tmpdir()/rdm-<uid>-<key>.json`，其中 `uid = process.getuid?.() ?? 'x'`
 - `key = sha1((compiler.name || 'rspack') + '|' + compiler.context + '|' + compiler.options.output.path)` 的前 12 位十六进制（服务端用 `node:crypto` 计算）。**掺入 `output.path` 的原因**：未命名的 MultiCompiler 子 compiler 共享同一 `context` 且 `name` 均为 undefined，仅按 `name|context` 计算 key 必然冲突；`output.path` 各子 compiler 不同且重启后稳定
+- **路径由服务端单边计算**：服务端算出通道文件绝对路径后，经 `EntryPlugin` 注入参数 `channel` 下发给客户端（客户端与服务端同机，绝对路径直接可用）；客户端只拿参数用，不引 `node:os`/`node:path`
 - **不用 uuid 命名**：dev server 重启会生成新 uuid，按 uuid 命名会让旧 SSR 进程永久收不到通知（僵尸客户端）
 - payload 内携带 `uuid`，用于过期检测（见 6.4）
 
@@ -181,7 +178,7 @@ rspack node target 的 HMR runtime 通过**真实文件系统** `require` 加载
 1. `Socket.ts`：`#broadcast` 增加"写通道文件"分支（所有 compiler 无差别双写：WS + 文件）；构造时计算稳定 `key`；写入串行化队列；dispose 清理
 2. 新增通道文件写入/清理的工具函数（原地覆写、节流、`mode: 0o600`）
 3. hot 模块启用时，对 node 系 target 的 compiler 自动强制 `writeToDisk: true`（见 6.5，服务端内部判断，无用户选项）
-4. 注入逻辑**不变**：仍是 `EntryPlugin(client?params)`，params 不变（`wss` 等参数 node 客户端自行忽略）
+4. 注入逻辑基本不变：仍是 `EntryPlugin(client?params)`；params 增加 `channel`（通道文件绝对路径，见 6.1，`wss` 等参数 node 客户端自行忽略）
 5. **删除项**：无 target 推导的用户选项、无 `hot.target`/`hot.origin`、schema 无扩展
 
 ## 10. 客户端改动清单（`src/client/`）
@@ -210,7 +207,11 @@ src/client/
 - 已知代价（dev-only，可接受）：
   - node bundle 携带 ~几 KB 永不执行的 DOM UI 死代码
   - web bundle 携带 ~1KB 永不执行的文件通道代码
-- README 补充：SSR server 入口需 `if (import.meta.webpackHot) import.meta.webpackHot.accept();`（否则变更 unaccepted 触发 fallback）；node 热更依赖 `writeToDisk`（hot 模块对 node target 自动启用，见 6.5）
+- README 补充 **HMR 更新规则的使用说明**（模块替换规则本质上是使用者的责任，中间件只负责通知/触发 `check/apply`/降级）：
+  - 完全不写 accept → 变更 unaccepted → 走 fallback（退出/告警），符合预期
+  - 入口自接受（最低要求）：`if (import.meta.webpackHot) import.meta.webpackHot.accept();` — 未被显式接受的变更冒泡到入口并重新执行入口模块；适用于每次请求动态读取导出的消费方式
+  - 精确规则（可选）：`import.meta.webpackHot.accept('./render', () => { handler.render = require('./render'); })` — 按依赖定义替换逻辑、重绑捕获的引用
+  - node 热更依赖 `writeToDisk`（hot 模块对 node target 自动启用，见 6.5）
 
 ## 12. 错误处理
 
