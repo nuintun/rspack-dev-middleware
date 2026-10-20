@@ -1,8 +1,13 @@
 # 同构热更客户端设计（Isomorphic Hot Client）
 
 - 日期：2026-10-20
-- 状态：已评审通过（待实现）
+- 状态：已评审（WS 统一传输版，待实现）
 - 范围：`rspack-dev-middleware` 热更（hot）模块
+
+## 修订记录
+
+- v2（2026-10-20）：传输统一为 WebSocket，node 端删除文件通道与全部 node 内置模块依赖；恢复 `hot.origin`；`engines` 提升至 `>=22`
+- v1（2026-10-20）：初版（文件通道方案，已废弃）
 
 ## 1. 背景与目标
 
@@ -12,40 +17,41 @@
 
 ### 设计原则
 
-- 客户端**同构**：单一入口，运行时按环境能力自适配，不做任何注入期选择
+- 客户端**同构**：单一入口、单一传输（WebSocket），运行时按环境能力选择 UI 适配器，不做任何注入期选择
 - 机制与业务分离：`createClient` 只保留通用机制（传输、消息分发、重连、HMR），所有环境差异通过 adapter 注入
-- 零配置：不新增任何用户选项，不引入推导报错
-- 最小侵入：现有 web 文件、构建配置、`package.json` exports 尽量不动
+- **零 node 内置模块依赖**：node 端只使用全局量（`WebSocket`、`process.stdout`、`process.exit`），客户端不引入任何 `node:*` 模块，web 构建无污染
+- 最小侵入：现有 web 文件、构建配置、`package.json` exports 不动
 
 ## 2. 总体架构
 
 ```
-┌──────────────────────────── 服务端 Socket ────────────────────────────┐
-│  compiler invalid/done/progress/issues                               │
-│    ├─ WebSocket 广播（不变，浏览器/worker 消费）                        │
-│    └─ 覆写通道文件 os.tmpdir()/rdm-<uid>-<key>.json（node 客户端消费）  │
-└──────────────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┴──────────────────────┐
-        │ 同构客户端（唯一入口，注入所有 compiler）      │
-        │  启动时环境检测（DOM 优先）：                  │
-        │   有 DOM → WebSocket + Progress/Overlay     │
-        │   node   → 文件通道 + console 适配           │
-        │   worker → WebSocket + console 适配         │
-        └────────────────────────────────────────────┘
+┌────────────────── 服务端 Socket ──────────────────┐
+│  compiler invalid/done/progress/issues            │
+│    └─ WebSocket 广播（逻辑不变，三类客户端消费）      │
+└───────────────────────────────────────────────────┘
+                       │
+        ┌──────────────┴──────────────┐
+        │ 同构客户端（唯一入口，注入所有 compiler）
+        │  传输统一为 WebSocket；仅 UI 适配器不同：
+        │   有 DOM → DOM 适配（Progress + Overlay）
+        │   node   → ANSI console 适配
+        │   worker → 纯文本 console 适配
+        └─────────────────────────────┘
 ```
+
+服务端广播逻辑与今天完全一致（纯 WS），无文件写入、无双写分支。
 
 ## 3. 能力矩阵
 
-| 运行环境（启动时检测）           | UI 适配                                    | 传输      |
-| -------------------------------- | ------------------------------------------ | --------- |
-| 有 `document`（浏览器）          | Progress 进度环 + Overlay 错误遮罩（现状） | WebSocket |
-| 无 DOM、非 node（webworker）     | console 输出（纯文本）                     | WebSocket |
-| node（`process.versions?.node`） | console 输出（ANSI 检测）                  | 文件通道  |
+| 运行环境（启动时检测）           | UI 适配器                                            | 传输      |
+| -------------------------------- | ---------------------------------------------------- | --------- |
+| 有 `document`（浏览器）          | DOM 适配：Progress 进度环 + Overlay 错误遮罩（现状） | WebSocket |
+| node（`process.versions?.node`） | ANSI console 适配：单行进度 + issues 输出            | WebSocket |
+| 无 DOM、非 node（webworker）     | 纯文本 console 适配                                  | WebSocket |
 
-环境检测：`typeof document !== 'undefined'` 判定 DOM；`typeof process !== 'undefined' && !!process.versions?.node` 判定 node。**检测顺序为 DOM 优先 → node → worker**（worker 中两者皆 false，走 console + WebSocket）。
+环境检测：`typeof document !== 'undefined'` 判定 DOM；`typeof process !== 'undefined' && !!process.versions?.node` 判定 node。**检测顺序为 DOM 优先 → node → worker**（worker 中两者皆 false）。
 
-DOM 优先的原因：electron-renderer（nodeIntegration）、nw.js 等同时具备 DOM 与 node 的环境必须维持既有 WebSocket + Overlay 行为，不因 node 检测命中而退化为文件通道 + console。
+DOM 优先的原因：electron-renderer（nodeIntegration）、nw.js 等同时具备 DOM 与 node 的环境必须维持既有 WebSocket + Overlay 行为，不因 node 检测命中而退化为 console。
 
 ## 4. 核心接口
 
@@ -61,22 +67,23 @@ export interface Adapter {
   showProgress(): void;
   updateProgress(percent: number): void;
   hideProgress(): void;
-  /** 降级处理（web: location.reload；node: process.exit(0)） */
+  /** 降级处理（DOM: location.reload；console: process.exit(0)） */
   fallback(error?: Error): Promise<void> | void;
 }
 
 export function createClient(options: Options, adapter: Adapter): void;
 ```
 
-消息分发逻辑（`invalid → showProgress`、`progress → updateProgress`、`hash → hot.updateHash`、`issues → setIssues + 无 error 时 performUpdate`、`ok → 收尾 + performUpdate`、所有消息 `emit` 到 events 总线）为两端共享，实现单份维护。
+消息分发逻辑（`invalid → showProgress`、`progress → updateProgress`、`hash → hot.updateHash`、`issues → setIssues + 无 error 时 performUpdate`、`ok → 收尾 + performUpdate`、所有消息 `emit` 到 events 总线）为三类环境共享，实现单份维护。
 
 **职责边界（传输层 vs adapter）**：
 
-- 传输层（WS / 文件通道）负责：连接生命周期、WS 关闭码判定（4000/4001 → 调用 `adapter.fallback`）、非正常断线时调用 `adapter.hideIssues()/hideProgress()` 收起 UI、3s 重连
+- 传输层负责：连接生命周期、WS 关闭码判定（4000/4001 → 调用 `adapter.fallback`）、非正常断线时调用 `adapter.hideIssues()/hideProgress()` 收起 UI、3s 重连
 - adapter 负责：UI 状态渲染与降级动作（`fallback`），不感知连接细节
-- 文件通道无连接概念：watch/轮询异常不触发 fallback，仅 uuid 不匹配（见 6.4）触发降级
 
-## 5. 同构入口与 node 内置模块隔离
+三类环境共享同一传输实现，职责边界天然一致。
+
+## 5. 同构入口
 
 `src/client/main.ts` 启动逻辑：
 
@@ -88,68 +95,53 @@ if (hasDOM) {
   // 浏览器（现状路径，行为不变）
   startWSClient(getWSOptions(), createDOMAdapter());
 } else if (isNode) {
-  // SSR 服务端：通道文件绝对路径由服务端经注入参数下发，仅需 node:fs
-  import(/* webpackIgnore: true */ 'node:fs').then(fs => startFileClient(getCommonOptions(), fs));
+  // SSR 服务端：全局 WebSocket + ANSI console 适配，零 node:* 导入
+  startWSClient(getWSOptions(), createAnsiConsoleAdapter());
 } else {
-  // webworker：完整 HMR + console 输出
+  // webworker：完整 HMR + 纯文本 console 输出
   startWSClient(getWSOptions(), createConsoleAdapter());
 }
 ```
 
 要点：
 
-- 客户端**仅动态引入 `node:fs`**（watch + readFile，即传输本身），通过 `/* webpackIgnore: true */` 魔法注释引用（rspack 支持）。同一份源码在 web target 构建不会触发模块解析错误，node target 运行时原生加载。通道文件路径由服务端计算并经注入参数下发（见 6.1），客户端不做任何路径计算，**不依赖 `node:os`/`node:path`**
-- 禁止顶层 await（兼容 cjs 产物），node 分支使用异步 IIFE/Promise 链
-- **选项解析拆分**：`getCommonOptions()`（uuid/name/hmr/reload/overlay/progress/path）两端共享；`origin/wss` 属 WS 专属，仅在 `getWSOptions()` 中解析（现 `main.ts` 的 `getOrigin` 依赖 `document`/`self.location`，node 下会 ReferenceError，必须移入 WS 分支；worker 分支的 `getCurrentScript` 需 `typeof document` 守卫）
+- **客户端不引入任何 `node:*` 模块**：传输用全局 `WebSocket`（Node ≥22 / 浏览器 / worker 原生可用），ANSI 检测读 `process.stdout.isTTY`，降级用 `process.exit` —— 全部为全局量，无动态 import、无 webpackIgnore、无构建特判
+- **选项解析拆分**：`getCommonOptions()`（uuid/name/hmr/reload/overlay/progress/path）三类环境共享；WS 地址解析分环境 —— DOM/worker 分支沿用现有推导（`script.src` / `location`，worker 分支的 `getCurrentScript` 需 `typeof document` 守卫）；**node 分支从注入参数 `origin` 读取**（见 §6，node 无 `location`）
 - `__resourceQuery` 为编译期注入常量，node target 同样可用
-- web 启动守卫由 `typeof document !== 'undefined'` 放宽为覆盖 worker（`document.readyState` 检查仅在 hasDOM 时执行）
+- web 启动守卫由 `typeof document !== 'undefined'` 放宽为覆盖 worker（`document.readyState` 检查仅在 hasDOM 时执行），webworker 从"客户端不启动"变为"完整 HMR + console 输出"
 
-## 6. node 文件通道
+## 6. `hot.origin` 与连接建立
 
-### 6.1 通道命名（稳定 key）
+### 6.1 选项
 
-- 文件名：`os.tmpdir()/rdm-<uid>-<key>.json`，其中 `uid = process.getuid?.() ?? 'x'`
-- `key = sha1((compiler.name || 'rspack') + '|' + compiler.context + '|' + compiler.options.output.path)` 的前 12 位十六进制（服务端用 `node:crypto` 计算）。**掺入 `output.path` 的原因**：未命名的 MultiCompiler 子 compiler 共享同一 `context` 且 `name` 均为 undefined，仅按 `name|context` 计算 key 必然冲突；`output.path` 各子 compiler 不同且重启后稳定
-- **路径由服务端单边计算**：服务端算出通道文件绝对路径后，经 `EntryPlugin` 注入参数 `channel` 下发给客户端（客户端与服务端同机，绝对路径直接可用）；客户端只拿参数用，不引 `node:os`/`node:path`
-- **不用 uuid 命名**：dev server 重启会生成新 uuid，按 uuid 命名会让旧 SSR 进程永久收不到通知（僵尸客户端）
-- payload 内携带 `uuid`，用于过期检测（见 6.4）
+```ts
+export interface Options {
+  // ...hmr/path/wss/reload/overlay/progress 不变
+  origin?: string; // node 客户端的 WS 地址，如 'ws://127.0.0.1:8000'
+}
+```
 
-### 6.2 写入（服务端）
+- `hot.origin` 由 `Socket` 写入注入参数（`params.set('origin', ...)`）下发给**所有** compiler 的客户端；DOM/worker 分支忽略该参数（沿用 location 推导），仅 node 分支消费
+- **fail-fast 校验**：hot 启用且存在 node 系 target 的 compiler（内部 `isNodeTarget` 判断，见 §7）而未设置 `hot.origin` → 中间件创建时抛错，消息含 compiler 名与修复方式
+- target 未知（`false`/`undefined`/`browserslist`/纯 es）时不做服务端校验；此时若运行时是 node 且缺少 `origin` 参数，客户端侧 `console.error` 明确提示后不连接（不退出）
+- web-only 项目不设置 `hot.origin` 不受任何影响
 
-- 触发时机与 WS 广播一致：`invalid / done(hash|issues|ok) / progress`
-- **原地覆写**（`writeFile` 截断写，不用 `.tmp + rename` 原子写）：rename 换 inode 会破坏 Windows/macOS 上对单文件的 `fs.watch`；半截 JSON 由读取端"解析失败静默跳过"消化（见 6.3）
-- **写入串行化**：同一 compiler 的写操作入队串行执行，避免并发 `writeFile` 交错产生瞬时坏 JSON（与解析跳过构成双保险）
-- `progress` 写入按 100ms 节流；其余消息即时写
-- `writeFile` 显式 `mode: 0o600`：stats 错误信息含绝对路径/源码片段，避免共享 tmpdir 下世界可读
-- "内容相同忽略"的判定为**原始字符串比较**（读取端）
-- Socket 关闭（dispose）时删除通道文件
+### 6.2 连接生命周期（与 web 端同一套机制）
 
-### 6.3 读取（node 客户端）
+- SSR 进程先于 dev server 启动 → 连接失败 → 3s 重试直至成功（天然覆盖崩溃循环场景，无需宽限逻辑）
+- dev server 重启 → 旧连接断开 → 4001（compiler not found）或重连失败 → 与 web 端一致的关闭码语义（4000/4001 → `fallback`）
+- `reload: true` → `process.exit(0)`（由 nodemon/pm2 拉起）；`reload: false` → `console.warn`
 
-- `fs.watch` 监听文件变更 + 1s 轮询兜底（防 watch 丢事件）
-- 读到的 JSON 与上一次内容相同则忽略；解析失败静默跳过（等待下次事件）
-- 消息进入与 web 端相同的分发管线
-
-### 6.4 过期检测（服务端重启）与启动宽限
-
-客户端发现 payload `uuid` 与自身注入 uuid 不一致 ⇒ 服务端已重启或残留了过期文件：
-
-- `reload: true` → `fallback()`（`process.exit(0)`，由 nodemon/pm2 拉起）
-- `reload: false` → `console.warn` 提示重启 SSR 进程
-
-与 web 端 WS 关闭码 4001（compiler not found）的语义对齐。
-
-**启动宽限（防御崩溃循环）**：dev server 被 SIGKILL/崩溃时不会执行 dispose，tmpdir 会残留旧 uuid 的文件；若 SSR 进程先于 dev server 启动，首轮读取即 mismatch，若直接降级会在 pm2 拉起策略下形成崩溃循环。因此：**客户端在首次 uuid 匹配成功之前，mismatch 仅告警一次、不触发 fallback**；一旦匹配过一次，此后 mismatch 才按上述 reload 语义降级。
-
-### 6.5 hot-update 文件落盘（node HMR 硬依赖）
+## 7. hot-update 文件落盘（node HMR 硬依赖）
 
 rspack node target 的 HMR runtime 通过**真实文件系统** `require` 加载 `.hot-update.js / .hot-update.json`；而 dev middleware 默认使用 memfs 且 `writeToDisk` 默认关闭（`src/server/dev/index.ts`）。若 hot-update 文件不落盘，`hot.check()` 永远失败 → 每次变更都走 fallback 退出，node 端 HMR 退化为重启循环。
 
-- hot 模块启用时，对 node 系 target 的 compiler **自动强制 `writeToDisk: true`**（服务端内部按 target 判断，无用户选项、无报错；target 未知时保持用户配置）
+- hot 模块启用时，对 node 系 target 的 compiler **自动强制 `writeToDisk: true`**（服务端内部 `isNodeTarget` 判断，无用户选项、无报错；target 未知时保持用户配置）
+- 服务端内部 `isNodeTarget`：node 系集合 `node / async-node / electron-main / electron-preload`；数组 target 任一命中即算；仅用于 §6.1 校验与本节自动落盘，**不作为用户选项、不产生推导报错**
 - README 同时写明前置条件：SSR bundle 本身必须从磁盘运行，`writeToDisk` 为 node 热更的必要条件
 - **实现前必须完成 spike 验证**（见 §13.0）：rspack node-target 下 `__webpack_require__.p` 的取值与 hot-update 文件的解析路径关系（是否需要绝对路径/file:// 形式，`publicPath` 如何影响）
 
-## 7. console 双层降级
+## 8. console 双层降级
 
 - **ANSI 检测**（内联实现，约 10 行，不引入 `supports-color` —— 该包静态 import `os/tty` 会污染 web 构建；检测按**目标流**分别判定）：
   - 非 node 环境（`typeof process === 'undefined'`）→ 纯文本
@@ -160,92 +152,86 @@ rspack node target 的 HMR runtime 通过**真实文件系统** `require` 加载
 - 浏览器 console（worker 路径）固定纯文本
 - node 端 progress 为单行刷新（`\r` 覆写），**仅在 `stdout.isTTY` 时启用**，非 TTY（重定向）按普通行输出；`issues` 经 stderr（`console.error`）、`progress` 经 stdout 输出
 
-## 8. 选项语义映射
+## 9. 选项语义映射
 
-不新增任何选项，现有 `hmr / reload / overlay / progress / path / wss` 在 node 端的映射：
+新增 `hot.origin`（node 连接地址，见 §6），其余现有选项在 node 端的映射：
 
-| 选项            | web（DOM）                | node（console）                       |
-| --------------- | ------------------------- | ------------------------------------- |
-| `hmr: false`    | fallback（整页刷新）      | fallback（退出进程）                  |
-| `reload: true`  | `location.reload()`       | `process.exit(0)`                     |
-| `reload: false` | console.warn 提示手动刷新 | console.warn 提示重启进程             |
-| `overlay`       | 控制 DOM 遮罩             | 无 DOM，仅 console 输出（无额外效果） |
-| `progress`      | 进度环                    | 终端单行进度                          |
-| `wss`           | 决定 ws/wss               | 不适用（无 WS 连接）                  |
+| 选项             | web（DOM）                   | node（ANSI console）                  |
+| ---------------- | ---------------------------- | ------------------------------------- |
+| `hmr: false`     | fallback（整页刷新）         | fallback（退出进程）                  |
+| `reload: true`   | `location.reload()`          | `process.exit(0)`                     |
+| `reload: false`  | console.warn 提示手动刷新    | console.warn 提示重启进程             |
+| `overlay`        | 控制 DOM 遮罩                | 无 DOM，仅 console 输出（无额外效果） |
+| `progress`       | 进度环                       | 终端单行进度                          |
+| `wss`            | 决定 ws/wss（location 推导） | 不适用（协议由 `origin` 值自带）      |
+| `origin`（新增） | 忽略（location 推导）        | 连接地址，node 系 target 必填         |
 
-## 9. 服务端改动清单（`src/server/hot/`）
+## 10. 服务端改动清单（`src/server/hot/`）
 
-1. `Socket.ts`：`#broadcast` 增加"写通道文件"分支（所有 compiler 无差别双写：WS + 文件）；构造时计算稳定 `key`；写入串行化队列；dispose 清理
-2. 新增通道文件写入/清理的工具函数（原地覆写、节流、`mode: 0o600`）
-3. hot 模块启用时，对 node 系 target 的 compiler 自动强制 `writeToDisk: true`（见 6.5，服务端内部判断，无用户选项）
-4. 注入逻辑基本不变：仍是 `EntryPlugin(client?params)`；params 增加 `channel`（通道文件绝对路径，见 6.1，`wss` 等参数 node 客户端自行忽略）
-5. **删除项**：无 target 推导的用户选项、无 `hot.target`/`hot.origin`、schema 无扩展
+1. `interface.ts`：Options 增加 `origin?: string`；`schema.ts` 增加 url 格式校验
+2. `Socket.ts`：注入参数增加 `origin`（配置了才传）；构造时校验"node 系 target 存在且缺 `origin`"→ 抛错
+3. `utils.ts`：新增内部 `isNodeTarget(compiler)`（node 系目标集合判断，含数组形态）
+4. 广播逻辑**零改动**（纯 WS，与今天一致）
+5. README：SSR 用法 + `hot.origin` + `import.meta.webpackHot.accept()` 使用说明（见 §12）
 
-## 10. 客户端改动清单（`src/client/`）
+## 11. 客户端改动清单（`src/client/`）
 
 ```
 src/client/
-├── main.ts          # 同构入口：环境检测 → 传输 + adapter 选择
-├── client.ts        # 重构：createClient(options, adapter)，WS 传输（浏览器/worker）
+├── main.ts          # 同构入口：环境检测 → adapter 选择（传输统一 WS）
+├── client.ts        # 重构：createClient(options, adapter)；getWSOptions 分环境地址解析
 ├── HotUpdate.ts     # 不动
 ├── events.ts        # 不动
 ├── index.ts         # 不动
 ├── ui/              # 现 DOM UI 不动
-└── node/
-    ├── main.ts      # node 启动：startFileClient
-    ├── channel.ts   # 文件通道：watch + 轮询 + 解析
-    └── ui.ts        # console adapter：ANSI 检测、单行进度、issues 输出、fallback exit
+└── console/
+    └── adapter.ts   # ANSI console 适配器（node 用）+ 纯文本适配器（worker 用）
 ```
 
-## 11. 构建与兼容性
+## 12. 构建与兼容性
 
-- `tools/rollup.base.ts`、`package.json`（exports / sideEffects / engines）**零改动**：仍是单入口 `client/main`
-- **构建产物验收标准（可执行断言，非人工检查）**：构建后运行脚本断言 esm/cjs 两份 client 产物中保留原生 `import("node:fs")` 动态导入形式（rollup 对 external 模块的动态导入不应转译为 require）；断言纳入测试脚本
-- **Plan B（若断言失败）**：如 cjs 输出转译了动态 import，或 web iife 目标工程（`output.environment.dynamicImport` 不满足）无法承载原生 `import()`，改用 `new Function('return import("node:fs")')()` 间接层 —— 该代码仅在 node 分支执行，浏览器侧为永不执行的死代码，不受 CSP 限制
-- `engines.node` 保持 `>=18`（node 客户端不使用 WebSocket）
-- `ws` 依赖保留（服务端 WS 仍用）
+- `tools/rollup.base.ts`、`package.json`（exports / sideEffects）**零改动**：仍是单入口 `client/main`
+- **`engines.node` 提升至 `>=22`**（全局 WebSocket 在 Node 22 为 stable；Node 18/20 已 EOL）
+- `ws` 依赖保留（服务端 WS 服务器仍用）
 - 已知代价（dev-only，可接受）：
   - node bundle 携带 ~几 KB 永不执行的 DOM UI 死代码
-  - web bundle 携带 ~1KB 永不执行的文件通道代码
+  - web bundle 携带 ~1KB 永不执行的 console 适配死代码
 - README 补充 **HMR 更新规则的使用说明**（模块替换规则本质上是使用者的责任，中间件只负责通知/触发 `check/apply`/降级）：
   - 完全不写 accept → 变更 unaccepted → 走 fallback（退出/告警），符合预期
   - 入口自接受（最低要求）：`if (import.meta.webpackHot) import.meta.webpackHot.accept();` — 未被显式接受的变更冒泡到入口并重新执行入口模块；适用于每次请求动态读取导出的消费方式
   - 精确规则（可选）：`import.meta.webpackHot.accept('./render', () => { handler.render = require('./render'); })` — 按依赖定义替换逻辑、重绑捕获的引用
-  - node 热更依赖 `writeToDisk`（hot 模块对 node target 自动启用，见 6.5）
+  - node 热更前置：`hot.origin` 必填（node 系 target 校验）、`writeToDisk` 自动启用（§7）
 
-## 12. 错误处理
+## 13. 错误处理
 
-| 场景                               | 行为                                                         |
-| ---------------------------------- | ------------------------------------------------------------ |
-| node HMR `check` 抛错 / unaccepted | adapter.fallback → `reload ? process.exit(0) : console.warn` |
-| 通道文件读取失败 / JSON 解析失败   | 静默跳过，等待下次 watch/轮询                                |
-| `fs.watch` 异常                    | 重建 watcher；轮询兜底保证最终一致                           |
-| payload uuid 不匹配（首次匹配前）  | 仅告警一次，不降级（防御崩溃循环，见 6.4）                   |
-| payload uuid 不匹配（已匹配过）    | 同 `reload` 语义（退出或告警，服务端已重启）                 |
-| tmpdir 残留文件                    | 文件名稳定、内容覆写，无累积问题；跨项目/跨用户由 `context   | output.path` 哈希 + uid 前缀隔离 |
+| 场景                                      | 行为                                                         |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| node HMR `check` 抛错 / unaccepted        | adapter.fallback → `reload ? process.exit(0) : console.warn` |
+| SSR 先于 dev server 启动                  | 连接失败 → 3s 重试，服务端就绪后自然连上                     |
+| WS 关闭码 4000/4001                       | adapter.fallback（与 web 端一致）                            |
+| node 系 target 未设置 `hot.origin`        | 服务端创建中间件时抛错（fail-fast）                          |
+| target 未知 + 运行时为 node + 缺 `origin` | 客户端 `console.error` 提示，不连接、不退出                  |
+| 断线                                      | 收起 UI，3s 重连（与 web 端一致）                            |
 
-## 13. 测试计划
+## 14. 测试计划
 
-### 13.0 前置 spike（go/no-go，实现前必须完成）
+### 14.0 前置 spike（go/no-go，实现前必须完成）
 
-1. **rspack node-target HMR 端到端**：验证 `import.meta.webpackHot.check/apply` 在 node target 真实可用，确认 hot-update 文件落盘路径与 `publicPath`/`__webpack_require__.p` 的解析关系（决定 6.5 是否需要调整输出路径处理）
-2. **webpackIgnore 动态 import 构建行为**：本包 esm/cjs 产物被 rspack 以 web/node target 消费时，`import(/* webpackIgnore: true */ 'node:*')` 是否保持原生形式、iife 目标是否可用（决定是否启用 Plan B）
+**rspack node-target HMR 端到端**：验证 `import.meta.webpackHot.check/apply` 在 node target 真实可用，确认 hot-update 文件落盘路径与 `publicPath`/`__webpack_require__.p` 的解析关系（决定 §7 是否需要调整输出路径处理）
 
-### 13.1 验证路径
+### 14.1 验证路径
 
 - 新增 `tests/node/` SSR 风格示例：`target: 'node'` compiler + dev middleware + server 入口 `import.meta.webpackHot.accept()`
   1. 启动后修改 server 源码 → 终端出现 rebuild/进度 → 热更生效（无需重启）
   2. 制造 unaccepted 变更 → `reload: true` 进程退出；`reload: false` 仅告警
-  3. 重启 dev server（不重启 SSR 进程）→ 旧 SSR 进程收到 uuid 不匹配 → 按 reload 语义退出/告警
-  4. **SSR 先于 dev server 启动**（残留旧 uuid 文件）→ 宽限窗口内仅告警不退出（6.4）
-  5. **双 dev server 同项目并发** → 各自 key 隔离（`output.path` 掺入），互不干扰
+  3. 重启 dev server（不重启 SSR 进程）→ 旧连接 4001 → 按 reload 语义退出/告警
+  4. **SSR 先于 dev server 启动** → 3s 重试直至连上，无崩溃循环
+  5. node 系 target 未设置 `hot.origin` → 中间件创建抛错
 - web 示例回归：HMR、进度环、overlay、断线重连行为不变；webworker 下客户端可启动且 console 输出（真实浏览器 harness）
-- **构建产物断言脚本**：esm/cjs 产物保留原生 `import("node:fs")`（§11 验收标准）；web iife 目标工程冒烟
 - `pnpm lint`（tsc --noEmit）通过
 
-## 14. 非目标（本次不做）
+## 15. 非目标（本次不做）
 
 - SSR 联动刷新：server bundle 更新后通知浏览器整页刷新（跨 compiler 通知，后续增强）
 - node → 服务端上行消息通道（当前协议为纯下行）
-- Docker 跨命名空间部署（服务端与 SSR 进程不同文件系统/网络）场景
-- 边缘运行时（非 Node 的 `process` 伪装环境）深度兼容
+- 边缘运行时（无全局 WebSocket 的老版本 Node、`process` 伪装环境）深度兼容
