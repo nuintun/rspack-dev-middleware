@@ -3,16 +3,16 @@
  */
 
 import { Context } from 'koa';
-import { v7 as uuid7 } from 'uuid';
 import { Buffer } from 'node:buffer';
 import { Messages } from './Message';
 import * as rspack from '@rspack/core';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import WebSocket, { WebSocketServer } from 'ws';
 import { getCompilers, PLUGIN_NAME } from '/server/utils';
 import { GetProp, Logger, UnionCompiler } from '/server/interface';
-import { Clients, CompilerContext, NormalizedOptions, Options } from './interface';
+import { CompilerContext, NormalizedOptions, Options } from './interface';
 import { BASE_URL, getOptions, getStatsOptions, getTimestamp, hasIssues, isUpgradable } from './utils';
 
 function entrypoint(): string {
@@ -38,7 +38,7 @@ export class Socket {
     const contexts = new Map<string, CompilerContext>();
 
     for (const compiler of compilers) {
-      const uuid = uuid7();
+      const uuid = randomUUID();
       const context: CompilerContext = {
         uuid,
         stats: null,
@@ -95,7 +95,7 @@ export class Socket {
         const { stats } = context;
 
         // Broadcast stats.
-        if (stats) {
+        if (stats && context.clients.size > 0) {
           this.#broadcastStats(context.clients, stats);
         }
       });
@@ -173,9 +173,7 @@ export class Socket {
           });
 
           if (stats) {
-            const clients = new Set([client]);
-
-            this.#broadcastStats(clients, stats);
+            this.#broadcastStats([client], stats);
           }
         } else {
           client.close(4001, 'compiler not found');
@@ -190,25 +188,26 @@ export class Socket {
     });
   }
 
-  #broadcast<A extends keyof Messages>(clients: Clients, action: A, payload: GetProp<Messages, A>): void {
+  #broadcast<A extends keyof Messages>(clients: Iterable<WebSocket>, action: A, payload: GetProp<Messages, A>): void {
+    // Serialize once, send to all.
+    const message = JSON.stringify({ action, payload });
+
     for (const client of clients) {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ action, payload }));
+        client.send(message);
       }
     }
   }
 
-  #broadcastStats(clients: Clients, stats: Required<rspack.StatsCompilation>): void {
-    if (clients.size > 0) {
-      const { hash, errors, warnings, builtAt: timestamp } = stats;
+  #broadcastStats(clients: Iterable<WebSocket>, stats: Required<rspack.StatsCompilation>): void {
+    const { hash, errors, warnings, builtAt: timestamp } = stats;
 
-      this.#broadcast(clients, 'hash', { hash, timestamp });
+    this.#broadcast(clients, 'hash', { hash, timestamp });
 
-      if (hasIssues(errors) || hasIssues(warnings)) {
-        this.#broadcast(clients, 'issues', { errors, warnings, timestamp });
-      } else {
-        this.#broadcast(clients, 'ok', { timestamp });
-      }
+    if (hasIssues(errors) || hasIssues(warnings)) {
+      this.#broadcast(clients, 'issues', { errors, warnings, timestamp });
+    } else {
+      this.#broadcast(clients, 'ok', { timestamp });
     }
   }
 

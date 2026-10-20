@@ -4,7 +4,7 @@
  */
 
 import * as rspack from '@rspack/core';
-import { ansiToHTML, appendDOMString, getRootElement, insertCSSString } from './utils';
+import { ansiToHTML, appendMarkup, appendStyleSheet, escapeHTML, getRootElement } from './utils';
 
 const OVERLAY = 'rdm-overlay';
 
@@ -183,9 +183,9 @@ export class Overlay {
   constructor(name: string) {
     const root = getRootElement(OVERLAY);
 
-    insertCSSString(CSS, root);
+    appendStyleSheet(CSS, root);
 
-    const [dialog] = appendDOMString('text/html', HTML, root);
+    const dialog = appendMarkup('text/html', HTML, root);
 
     this.#dialog = dialog;
     this.#name = dialog.querySelector(`.${OVERLAY}-name`)!;
@@ -219,7 +219,7 @@ export class Overlay {
 
       for (const { moduleName, chunkName, message } of issues) {
         const details = ansiToHTML(message);
-        const filename = moduleName || chunkName || 'unknown';
+        const filename = escapeHTML(moduleName || chunkName || 'unknown');
 
         html += `<section><em>${name}</em> in ${filename}<pre>${details}</pre></section>`;
       }

@@ -5,7 +5,7 @@
  */
 
 import logo from './images/rspack-logo.svg';
-import { appendDOMString, getRootElement, insertCSSString } from './utils';
+import { appendMarkup, appendStyleSheet, getRootElement } from './utils';
 
 const DURATION = 256;
 const PROGRESS = 'rdm-progress';
@@ -62,10 +62,9 @@ export class Progress {
   constructor() {
     const root = getRootElement(PROGRESS);
 
-    insertCSSString(CSS, root);
+    appendStyleSheet(CSS, root);
 
-    [this.#svg] = appendDOMString('image/svg+xml', SVG, root);
-
+    this.#svg = appendMarkup('image/svg+xml', SVG, root);
     this.#track = this.#svg.querySelector(`.${PROGRESS}-track`)!;
   }
 

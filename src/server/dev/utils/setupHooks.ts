@@ -6,16 +6,10 @@ import * as rspack from '@rspack/core';
 import supportsColor from 'supports-color';
 import { UnionStats } from '/server/interface';
 import { InitialContext } from '/server/dev/interface';
-import { isBoolean, isMultiCompiler, isString, PLUGIN_NAME } from '/server/utils';
+import { isMultiCompiler, PLUGIN_NAME, toStatsPreset } from '/server/utils';
 
 function normalizeStatsOptions(statsOptions?: rspack.StatsValue): rspack.StatsOptions {
-  if (statsOptions == null) {
-    return { preset: 'normal' };
-  } else if (isString(statsOptions)) {
-    return { preset: statsOptions };
-  } else if (isBoolean(statsOptions)) {
-    return statsOptions ? { preset: 'normal' } : { preset: 'none' };
-  }
+  statsOptions = toStatsPreset(statsOptions);
 
   if (statsOptions.colors == null) {
     const { stdout, stderr } = supportsColor;

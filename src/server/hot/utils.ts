@@ -4,7 +4,7 @@
 
 import { Context } from 'koa';
 import * as rspack from '@rspack/core';
-import { isBoolean, isString } from '/server/utils';
+import { toStatsPreset } from '/server/utils';
 import { NormalizedOptions, Options } from './interface';
 
 export const BASE_URL = 'wss://127.0.0.1';
@@ -35,16 +35,8 @@ export function hasIssues<T>(issues: ArrayLike<T> | undefined): boolean {
 }
 
 export function getStatsOptions(compiler: rspack.Compiler): rspack.StatsOptions {
-  let statsOptions = compiler.options.stats;
-
-  if (isString(statsOptions)) {
-    statsOptions = { preset: statsOptions };
-  } else if (isBoolean(statsOptions)) {
-    statsOptions = statsOptions ? { preset: 'normal' } : { preset: 'none' };
-  }
-
   return {
-    ...statsOptions,
+    ...toStatsPreset(compiler.options.stats),
     all: false,
     hash: true,
     colors: true,

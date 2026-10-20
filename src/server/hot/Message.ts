@@ -3,19 +3,20 @@
  */
 
 import * as rspack from '@rspack/core';
-import { GetProp } from '/server/interface';
 
-export interface Invalid {
-  action: 'invalid';
-  payload: {
+export interface Messages {
+  ok: {
+    timestamp: number;
+  };
+  hash: {
+    hash: string;
+    timestamp: number;
+  };
+  invalid: {
     timestamp: number;
     path: string | null;
   };
-}
-
-export interface Progress {
-  action: 'progress';
-  payload: {
+  progress: {
     stage: string;
     percent: number;
     details: {
@@ -23,38 +24,13 @@ export interface Progress {
       moduleIdentifier?: string;
     };
   };
-}
-
-export interface Hash {
-  action: 'hash';
-  payload: {
-    hash: string;
-    timestamp: number;
-  };
-}
-
-export interface Issues {
-  action: 'issues';
-  payload: {
+  issues: {
     timestamp: number;
     errors: rspack.StatsError[];
     warnings: rspack.StatsError[];
   };
 }
 
-export interface Ok {
-  action: 'ok';
-  payload: {
-    timestamp: number;
-  };
-}
-
-export interface Messages {
-  ok: GetProp<Ok, 'payload'>;
-  hash: GetProp<Hash, 'payload'>;
-  issues: GetProp<Issues, 'payload'>;
-  invalid: GetProp<Invalid, 'payload'>;
-  progress: GetProp<Progress, 'payload'>;
-}
-
-export type Message = Invalid | Progress | Hash | Issues | Ok;
+export type Message = {
+  [A in keyof Messages]: { action: A; payload: Messages[A] };
+}[keyof Messages];

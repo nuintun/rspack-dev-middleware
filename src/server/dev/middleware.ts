@@ -4,7 +4,6 @@
 
 import { Middleware } from 'koa';
 import { Service } from './Service';
-import { ready } from './utils/ready';
 import { decodeURI } from './utils/http';
 import { getPaths } from './utils/paths';
 import { UnionStats } from '/server/interface';
@@ -26,14 +25,14 @@ function getFileServices(context: Context, stats: UnionStats): FileService[] {
 
 function getFileServicesAsync(context: Context): Promise<FileService[]> {
   return new Promise(resolve => {
-    const { stats } = context;
+    const { stats, callbacks } = context;
 
-    // If stats exists, resolve immediately.
+    // Resolve immediately if stats exists.
     if (stats) {
       resolve(getFileServices(context, stats));
     } else {
       // Otherwise, wait until bundle finished.
-      ready(context, stats => {
+      callbacks.push(stats => {
         resolve(getFileServices(context, stats));
       });
     }

@@ -3,15 +3,10 @@
  */
 
 import { isMultiCompiler } from '/server/utils';
-import { UnionWatching } from '/server/interface';
 import { ErrorCallback, InitialContext } from '/server/dev/interface';
 
-function getWatching({ compiler, logger }: InitialContext): UnionWatching {
-  const isMulti = isMultiCompiler(compiler);
-
-  if (!isMulti && compiler.watching) {
-    return compiler.watching;
-  }
+export function setupWatching(context: InitialContext): void {
+  const { compiler, logger } = context;
 
   const errorHandler: ErrorCallback = error => {
     if (error != null) {
@@ -22,19 +17,14 @@ function getWatching({ compiler, logger }: InitialContext): UnionWatching {
     }
   };
 
-  if (!isMulti) {
-    const { watchOptions } = compiler.options;
+  if (isMultiCompiler(compiler)) {
+    const watchOptions = compiler.compilers.map(({ options }) => {
+      return options.watchOptions;
+    });
 
-    return compiler.watch(watchOptions, errorHandler);
+    context.watching = compiler.watch(watchOptions, errorHandler);
+  } else {
+    // Reuse existing watching if present, otherwise start watching.
+    context.watching = compiler.watching ?? compiler.watch(compiler.options.watchOptions, errorHandler);
   }
-
-  const watchOptions = compiler.compilers.map(({ options }) => {
-    return options.watchOptions;
-  });
-
-  return compiler.watch(watchOptions, errorHandler);
-}
-
-export function setupWatching(context: InitialContext): void {
-  context.watching = getWatching(context);
 }

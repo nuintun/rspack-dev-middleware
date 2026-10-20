@@ -6,24 +6,20 @@ import { Options } from './client';
 import { GetProp } from '/server/interface';
 import { Messages } from '/server/hot/Message';
 
-type Listeners = {
-  [E in keyof Events]: GetProp<Events, E>[];
-};
-
-export interface Events {
-  ok(message: GetProp<Messages, 'ok'>, options: Options): void;
-  hash(message: GetProp<Messages, 'hash'>, options: Options): void;
-  issues(message: GetProp<Messages, 'issues'>, options: Options): void;
-  invalid(message: GetProp<Messages, 'invalid'>, options: Options): void;
-  progress(message: GetProp<Messages, 'progress'>, options: Options): void;
-}
-
 const events: Listeners = {
   ok: [],
   hash: [],
   issues: [],
   invalid: [],
   progress: []
+};
+
+type Listeners = {
+  [E in keyof Events]: GetProp<Events, E>[];
+};
+
+export type Events = {
+  [E in keyof Messages]: (message: Messages[E], options: Options) => void;
 };
 
 /**

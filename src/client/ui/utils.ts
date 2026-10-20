@@ -124,36 +124,23 @@ export function getRootElement(tagName: string): ShadowRoot {
   return shadowRoot;
 }
 
-export function insertCSSString(
-  css: string,
-  root: HTMLElement | ShadowRoot = document.body,
-  styleElement: HTMLStyleElement = document.createElement('style')
-): HTMLStyleElement {
-  styleElement.appendChild(document.createTextNode(css));
+export function appendStyleSheet(css: string, root: RootElement): void {
+  const styleElement = document.createElement('style');
 
-  if (!root.contains(styleElement)) {
-    root.appendChild(styleElement);
-  }
+  styleElement.textContent = css;
 
-  return styleElement;
+  root.appendChild(styleElement);
 }
 
-export function appendDOMString<T extends DOMParserSupportedType>(
-  type: T,
-  string: string,
-  root: RootElement = document.body
-): (T extends 'image/svg+xml' ? SVGElement : HTMLElement)[] {
-  const nodes: ChildNode[] = [];
-  const parser = new DOMParser();
-  const fragment = document.createDocumentFragment();
-  const { body, childNodes } = parser.parseFromString(string, type);
+export function appendMarkup(type: 'text/html', html: string, root: RootElement): HTMLElement;
+export function appendMarkup(type: 'image/svg+xml', svg: string, root: RootElement): SVGElement;
+export function appendMarkup(type: 'text/html' | 'image/svg+xml', string: string, root: RootElement): Element {
+  const { body, documentElement } = new DOMParser().parseFromString(string, type);
+  // XML: the root element is documentElement.
+  // HTML: the implicit <head> precedes <body>, the root element is body.firstElementChild.
+  const element = type === 'image/svg+xml' ? documentElement : body.firstElementChild!;
 
-  for (const node of body ? body.childNodes : childNodes) {
-    nodes.push(node);
-    fragment.appendChild(node);
-  }
+  root.appendChild(element);
 
-  root.appendChild(fragment);
-
-  return nodes as (T extends 'image/svg+xml' ? SVGElement : HTMLElement)[];
+  return element;
 }

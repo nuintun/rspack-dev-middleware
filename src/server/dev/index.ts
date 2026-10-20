@@ -22,8 +22,12 @@ function setup(compiler: UnionCompiler, options: Options): Context {
     compiler,
     stats: null,
     callbacks: [],
-    logger: compiler.getInfrastructureLogger(PLUGIN_NAME),
-    options: { fs: createMemfs(), highWaterMark: 65536, ...options }
+    options: {
+      ...options,
+      fs: options.fs ?? createMemfs(),
+      highWaterMark: options.highWaterMark ?? 65536
+    },
+    logger: compiler.getInfrastructureLogger(PLUGIN_NAME)
   };
 
   setupHooks(context);

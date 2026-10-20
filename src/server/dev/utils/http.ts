@@ -4,9 +4,9 @@
 
 import { Context } from 'koa';
 import { Stats } from 'node:fs';
-import { generate } from './hash';
 import { Buffer } from 'node:buffer';
 import parseRange from 'range-parser';
+import { getRandomValues } from 'node:crypto';
 
 export interface Range {
   offset: number;
@@ -16,6 +16,7 @@ export interface Range {
 }
 
 const SPLIT_ETAG_RE = /\s*,\s*/;
+const BOUNDARY_SCRATCH = Buffer.allocUnsafeSlow(24);
 const SINGLE_ETAG_RE = /^(?:W\/)?"[ !#-\x7E\x80-\xFF]+"$/;
 
 /**
@@ -29,6 +30,14 @@ export function decodeURI(URI: string): string | -1 {
   } catch {
     return -1;
   }
+}
+
+/**
+ * @function generateBoundary
+ * @description Generate a boundary string.
+ */
+export function generateBoundary(): string {
+  return getRandomValues(BOUNDARY_SCRATCH).toString('base64url');
 }
 
 /**
@@ -170,7 +179,7 @@ export function parseRanges(context: Context, stats: Stats): -1 | -2 | Range[] {
           // Parsed entries.
           const entries = parsed.entries();
           // Range boundary.
-          const boundary = `${generate(32)}`;
+          const boundary = generateBoundary();
           // Multipart Content-Type.
           const contentType = `Content-Type: ${response.type}`;
           // Range suffix.

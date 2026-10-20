@@ -39,6 +39,18 @@ export function getCompilers(compiler: UnionCompiler): rspack.Compiler[] {
   return [compiler];
 }
 
+export function toStatsPreset(stats?: rspack.StatsValue): rspack.StatsOptions {
+  if (stats == null) {
+    return { preset: 'normal' };
+  } else if (isString(stats)) {
+    return { preset: stats };
+  } else if (isBoolean(stats)) {
+    return stats ? { preset: 'normal' } : { preset: 'none' };
+  }
+
+  return stats;
+}
+
 export function isMultiCompiler(compiler: UnionCompiler): compiler is rspack.MultiCompiler {
   return 'compilers' in compiler;
 }
