@@ -94,9 +94,30 @@ export const schema: Schema = {
       type: 'object',
       description: 'The output file system used by the dev server.'
     },
+    highWaterMark: {
+      description: 'The size of the read stream buffer.',
+      anyOf: [
+        {
+          type: 'number'
+        },
+        {
+          instanceof: 'Function'
+        }
+      ]
+    },
     stats: {
-      type: 'object',
-      description: 'Options for the statistics output.'
+      description: 'Options for the statistics output.',
+      anyOf: [
+        {
+          type: 'boolean'
+        },
+        {
+          type: 'string'
+        },
+        {
+          type: 'object'
+        }
+      ]
     },
     writeToDisk: {
       anyOf: [
