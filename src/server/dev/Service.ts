@@ -199,10 +199,8 @@ export class Service {
 
     // Head request.
     if (request.method === 'HEAD') {
-      // Set Content-Length.
+      // Set Content-Length, koa keeps it and sends no body for HEAD.
       response.length = stats.size;
-      // Set body null
-      response.body = null;
 
       // File found.
       return true;
@@ -213,11 +211,12 @@ export class Service {
 
     // 416
     if (ranges === -1) {
-      // Set Content-Range.
-      response.set('Content-Range', `bytes */${stats.size}`);
-
-      // Unsatisfiable 416.
-      return context.throw(416);
+      // koa strips all response headers on error, pass Content-Range via err.headers.
+      return context.throw(416, {
+        headers: {
+          'Content-Range': `bytes */${stats.size}`
+        }
+      });
     }
 
     // Set response body.
