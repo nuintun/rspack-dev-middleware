@@ -70,7 +70,16 @@ export function createETag(stats: Stats): string {
  * @param etag The etag value.
  * @param isIfMatch The flag of if-match.
  */
-function isETagMatch(match: string, etag: string, isIfMatch?: boolean): boolean {
+export function isETagMatch(match: string, etag: string, isIfMatch?: boolean): boolean {
+  // Trim match.
+  match = match.trim();
+
+  // Check If-Match.
+  if (isIfMatch && match === '*') {
+    // The condition is true if the selected representation exists.
+    return true;
+  }
+
   // Trim etag.
   etag = etag.trim();
 
@@ -79,21 +88,36 @@ function isETagMatch(match: string, etag: string, isIfMatch?: boolean): boolean 
     return false;
   }
 
-  // Trim match.
-  match = match.trim();
-
   // Check If-Match.
   if (isIfMatch) {
-    if (match === '*') {
-      return true;
-    }
-
     // If-Match maybe a list of etag.
     return match.split(SPLIT_ETAG_RE).includes(etag);
   }
 
   // Check If-Range.
   return match === etag;
+}
+
+/**
+ * @function isRangeFresh
+ * @description Check if request range fresh.
+ * @param context Koa context.
+ */
+export function isRangeFresh({ request, response }: Context): boolean {
+  const ifRange = request.get('If-Range');
+
+  // No If-Range.
+  if (!ifRange) {
+    return true;
+  }
+
+  // If-Range as modified date failed.
+  if (SINGLE_ETAG_RE.test(ifRange)) {
+    return isETagMatch(ifRange, response.get('ETag'));
+  }
+
+  // Check if Last-Modified is valid and equal to If-Range date
+  return Date.parse(response.get('Last-Modified')) <= Date.parse(ifRange);
 }
 
 /**
@@ -125,34 +149,12 @@ export function isPreconditionFailed({ request, response }: Context): boolean {
 }
 
 /**
- * @function isRangeFresh
- * @description Check if request range fresh.
- * @param context Koa context.
- */
-function isRangeFresh({ request, response }: Context): boolean {
-  const ifRange = request.get('If-Range');
-
-  // No If-Range.
-  if (!ifRange) {
-    return true;
-  }
-
-  // If-Range as modified date failed.
-  if (SINGLE_ETAG_RE.test(ifRange)) {
-    return isETagMatch(ifRange, response.get('ETag'));
-  }
-
-  // Check if Last-Modified is valid and equal to If-Range date
-  return Date.parse(response.get('Last-Modified')) <= Date.parse(ifRange);
-}
-
-/**
  * @function parseRanges
  * @description Parse ranges.
  * @param context The koa context.
  * @param stats The file stats.
  */
-export function parseRanges(context: Context, stats: Stats): -1 | -2 | Range[] {
+export function parseRanges(context: Context, stats: Stats): -1 | Range[] {
   const { size } = stats;
   const { request, response } = context;
 
@@ -166,9 +168,17 @@ export function parseRanges(context: Context, stats: Stats): -1 | -2 | Range[] {
       const parsed = parseRange(size, range, { combine: true });
 
       // -1 signals an unsatisfiable range.
-      // -2 signals a malformed header string.
-      if (parsed === -1 || parsed === -2) {
+      if (parsed === -1) {
         return parsed;
+      }
+
+      // -2 signals a malformed or unknown-unit range, ignore it (RFC 9110 §14.2).
+      if (parsed === -2) {
+        // Set Content-Length.
+        response.length = size;
+
+        // Return ranges.
+        return [{ offset: 0, length: size }];
       }
 
       // Ranges ok, support multiple ranges.

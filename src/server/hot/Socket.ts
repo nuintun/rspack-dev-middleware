@@ -95,7 +95,7 @@ export class Socket {
         const { stats } = context;
 
         // Broadcast stats.
-        if (stats && context.clients.size > 0) {
+        if (stats != null && context.clients.size > 0) {
           this.#broadcastStats(context.clients, stats);
         }
       });
@@ -159,7 +159,7 @@ export class Socket {
       if (uuid) {
         const context = contexts.get(uuid);
 
-        if (context) {
+        if (context != null) {
           const { stats } = context;
 
           context.clients.add(client);
@@ -172,7 +172,7 @@ export class Socket {
             logger.log('client disconnected');
           });
 
-          if (stats) {
+          if (stats != null) {
             this.#broadcastStats([client], stats);
           }
         } else {

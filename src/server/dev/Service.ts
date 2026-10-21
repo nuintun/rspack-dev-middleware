@@ -89,7 +89,7 @@ export class Service {
     const headers = await options.headers(path, stats);
 
     // If headers not empty, set headers.
-    if (headers) {
+    if (headers != null) {
       response.set(headers);
     }
 
@@ -218,11 +218,6 @@ export class Service {
 
       // Unsatisfiable 416.
       return context.throw(416);
-    }
-
-    // 400.
-    if (ranges === -2) {
-      return context.throw(400);
     }
 
     // Set response body.

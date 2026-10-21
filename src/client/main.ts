@@ -13,7 +13,7 @@ const isTLS = (protocol: string): boolean => {
 const getCurrentScript = (): HTMLScriptElement | void => {
   const { currentScript } = document;
 
-  if (currentScript) {
+  if (currentScript != null) {
     return currentScript as HTMLScriptElement;
   }
 };
@@ -33,7 +33,7 @@ const getOrigin = (params: URLSearchParams): string => {
   const { location } = self;
   const script = getCurrentScript();
 
-  if (script) {
+  if (script != null) {
     const url = new URL(script.src, location.href);
     const protocol = getProtocol(params, url.protocol);
 

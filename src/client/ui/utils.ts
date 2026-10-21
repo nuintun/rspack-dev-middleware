@@ -67,11 +67,11 @@ export function blockToHTML({ style, value, url }: AnsiBlock): string {
 
   const { color, background } = style;
 
-  if (color) {
+  if (color != null) {
     styles.push(`color: rgb(${color})`);
   }
 
-  if (background) {
+  if (background != null) {
     styles.push(`background-color: rgb(${background})`);
   }
 

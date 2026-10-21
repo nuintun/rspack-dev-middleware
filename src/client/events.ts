@@ -31,7 +31,7 @@ export type Events = {
 export function on<E extends keyof Events>(event: E, callback: GetProp<Events, E>): void {
   const callbacks = events[event];
 
-  if (callbacks) {
+  if (callbacks != null) {
     callbacks.push(callback);
   }
 }
@@ -45,8 +45,8 @@ export function on<E extends keyof Events>(event: E, callback: GetProp<Events, E
 export function off<E extends keyof Events>(event: E, callback?: GetProp<Events, E>): void {
   const callbacks = events[event];
 
-  if (callbacks) {
-    if (callback) {
+  if (callbacks != null) {
+    if (callback != null) {
       const index = callbacks.indexOf(callback);
 
       if (index >= 0) {
@@ -61,7 +61,7 @@ export function off<E extends keyof Events>(event: E, callback?: GetProp<Events,
 export function emit<E extends keyof Events>(event: E, message: GetProp<Messages, E>, options: Options): void {
   const callbacks = events[event];
 
-  if (callbacks && callbacks.length > 0) {
+  if (callbacks != null && callbacks.length > 0) {
     for (const callback of callbacks) {
       callback(message as any, options);
     }

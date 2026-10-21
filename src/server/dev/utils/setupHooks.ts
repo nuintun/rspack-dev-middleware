@@ -79,7 +79,7 @@ export function setupHooks(context: InitialContext): void {
       const { stats } = context;
 
       // Check if still in valid state.
-      if (stats) {
+      if (stats != null) {
         // Call onCompilationDone.
         onCompilationDone(stats, statsOptions);
 

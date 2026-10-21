@@ -48,7 +48,7 @@ async function dispatch<C>(
     await middleware(context, () => {
       return dispatch(middlewares, index + 1, stack, context, next);
     });
-  } else if (next) {
+  } else if (next != null) {
     await next();
   }
 }

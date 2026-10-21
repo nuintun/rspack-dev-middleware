@@ -118,7 +118,7 @@ export function createClient(options: Options): void {
     ws.onmessage = (message: MessageEvent<string>): void => {
       const parsed = parseMessage(message);
 
-      if (parsed) {
+      if (parsed != null) {
         const { action, payload } = parsed;
 
         switch (action) {
