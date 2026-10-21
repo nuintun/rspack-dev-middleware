@@ -10,7 +10,7 @@ export const schema: Schema = {
   type: 'object',
   properties: {
     hot: {
-      description: 'Enable or disable HMR server.',
+      description: 'Configure the HMR server, or set to false to disable.',
       anyOf: [
         {
           type: 'boolean',
@@ -33,7 +33,7 @@ export const schema: Schema = {
             },
             reload: {
               type: 'boolean',
-              description: 'Control whether the full page should be reloaded when HMR failure.'
+              description: 'Control whether the full page should be reloaded when HMR fails.'
             },
             overlay: {
               type: 'boolean',
@@ -133,7 +133,7 @@ export const schema: Schema = {
     },
     onCompilationDone: {
       instanceof: 'Function',
-      description: 'Callback function when the compilation is done, providing statistics and options.'
+      description: 'Callback function when the compilation is done, providing stats and stats options.'
     }
   },
   additionalProperties: false
