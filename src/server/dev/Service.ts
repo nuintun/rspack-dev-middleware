@@ -2,7 +2,6 @@
  * @module Service
  */
 
-import createETag from 'etag';
 import { Context } from 'koa';
 import { Stats } from 'node:fs';
 import { ReadStream } from './ReadStream';
@@ -10,7 +9,7 @@ import { isFunction } from '/server/utils';
 import { FileSystem, stat } from './utils/fs';
 import { extname, join, resolve } from 'node:path';
 import { hasTrailingSlash, isOutRoot, unixify } from './utils/path';
-import { isConditionalGET, isPreconditionFailed, parseRanges } from './utils/http';
+import { createETag, isConditionalGET, isPreconditionFailed, parseRanges } from './utils/http';
 
 interface Headers {
   [key: string]: string | string[];

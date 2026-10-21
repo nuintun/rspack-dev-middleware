@@ -55,6 +55,15 @@ export function isConditionalGET({ request }: Context): boolean {
 }
 
 /**
+ * @function createETag
+ * @description Generate a weak entity tag from file stats.
+ * @param stats The file stats.
+ */
+export function createETag(stats: Stats): string {
+  return `W/"${stats.size.toString(16)}-${stats.mtime.getTime().toString(16)}"`;
+}
+
+/**
  * @function isETagMatch
  * @see https://httpwg.org/specs/rfc9110.html
  * @param match The match value.
