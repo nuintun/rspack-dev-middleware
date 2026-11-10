@@ -1,13 +1,21 @@
-name: Publish to npm
+name: Deploy GitHub Pages
 on:
+  push:
+    branches:
+      - main
   # 手动触发
   workflow_dispatch:
+permissions:
+  pages: write
+  contents: read
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 jobs:
-  publish:
+  # 构建任务
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       # 检出代码
       - name: Checkout code
@@ -26,8 +34,25 @@ jobs:
       # 安装依赖
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      # 发布到 npm
-      - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NPM_CONFIG_PROVENANCE: true
+      # 构建项目
+      - name: Build GitHub Pages
+        run: pnpm build && pnpm prod
+      # 复制 spec
+      - name: Copy spec files
+        run: cp -r ./packages/core/spec ./packages/examples/wwwroot
+      # 上传构建产物
+      - name: Upload GitHub Pages
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./packages/examples/wwwroot
+  # 部署任务
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 部署到 GitHub Pages
+      - name: Deploy GitHub Pages
+        uses: actions/deploy-pages@v5
